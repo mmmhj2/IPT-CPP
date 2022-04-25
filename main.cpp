@@ -16,6 +16,7 @@
 #include "apriltag/apriltag.h"
 #include "nlohmann/json.hpp"
 #include "ipt_receiver.h"
+#include "ipt_receiver_new.h"
 #include "v4l2uvc.h"
 #include "avilib.h"
 
@@ -25,7 +26,7 @@
 
 using namespace std;
 using namespace cv;
-//using json = nlohmann::json;
+using json = nlohmann::json;
 
 
 int main() {
@@ -159,7 +160,7 @@ int main() {
                  << "yaw = " << angle[2] * 180 / M_PI << "; ";
 
             // UDP
-            /*
+            
             json j;
             j["name"] = "uav_0";
             j["x"] = position[0];
@@ -178,7 +179,7 @@ int main() {
             } else {
                 cout << "UDP sent failed!";
             }
-            */
+            
         }
         cout << endl;
 

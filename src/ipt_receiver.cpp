@@ -275,6 +275,9 @@ void IPTReceiver::_demodulate_one_t(Mat &f_pre, Mat &f_now, Mat &f_nxt, zarray_t
     // 1) image alignment
     int offset_x = 0;
     int offset_y = 0;
+
+    // NOTE : 此处的函数调用可能修改 f_now_l 的值
+    // 这可能影响第二次识别
     _align_img(f_pre_l, f_now_l, offset_x, offset_y);
 
     // 2) subtraction

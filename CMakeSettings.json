@@ -21,7 +21,7 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "linux_x86" ],
+      "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}"
     }
   ]
