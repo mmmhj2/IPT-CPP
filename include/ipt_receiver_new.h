@@ -46,6 +46,8 @@ namespace ipt
 		cv::Mat Substraction(cv::Mat& img_lightness_1, cv::Mat& img_lightness_2);
 		// Search for Apriltags in img
 		int Detection(const cv::Mat & img, zarray_t*& detections);
+		// Search for the coordinate of the given apriltag
+		void LookupMap(int index_num, int idx, cv::Mat& obj_pts);
 
 	public:
 		IPT_Receiver(const std::string& cam_path,
@@ -59,6 +61,15 @@ namespace ipt
 			const cv::Mat& img_nxt, 
 			zarray_t*& detections);
 
+		void EstimatePose(zarray_t*& detections, 
+			cv::Vec3d& position, 
+			cv::Vec3d& angle);
+
+		// Estimate the pose, but use an orientation supplied externally
+		void EstimatePoseWithOrientation(zarray_t*& detections,
+			cv::Vec3d& position,
+			cv::Vec3d& angle,
+			cv::Vec3d& orientation);
 	};
 }
 

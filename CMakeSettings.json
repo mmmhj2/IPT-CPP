@@ -19,7 +19,7 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeExecutable": "cmake",
       "cmakeCommandArgs": "-DPYTHON_EXECUTABLE=/usr/bin/python3 -DPYTHON_INCLUDE_DIR=/usr/include/python3.8 -DPYTHONPATH=/opt/ros/noetic/lib/python3/dist-packages",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-j16",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}"

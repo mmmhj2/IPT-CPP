@@ -31,6 +31,7 @@
 *.out
 *.app
 
+/videos/*
 /camera_calibration/8*
 /camera_calibration/9*
 /cmake-build-*-pi_4b

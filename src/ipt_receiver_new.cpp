@@ -82,6 +82,7 @@ ipt::IPT_Receiver::Preprocess(cv::Mat& img_sub)
 	cv::Size kernelSize{ int(6 * scale_f_params), int(6 * scale_f_params) };
 	cv::Mat kernel{ cv::Mat::ones(kernelSize, CV_8UC1) };
 	cv::morphologyEx(img_sub, img_sub, cv::MORPH_OPEN, kernel);
+
 	kernelSize = cv::Size{ int(15 * scale_f_params), int(15 * scale_f_params) };
 	kernel = cv::Mat::ones(kernelSize, CV_8UC1);
 	cv::morphologyEx(img_sub, img_sub, cv::MORPH_CLOSE, kernel);
@@ -123,6 +124,26 @@ int ipt::IPT_Receiver::Detection(const cv::Mat& img, zarray_t *& detections)
 	return zarray_size(detections);
 }
 
+void ipt::IPT_Receiver::LookupMap(int index_num, int idx, cv::Mat& obj_pts)
+{
+	double bias = map_info.layout[idx].size / 2.;
+	double x = map_info.layout[idx].x;
+	double y = map_info.layout[idx].y;
+
+	// this order is consistent with the required order of IPPE_SQUARE method.
+	obj_pts.at<double>(0 + index_num, 0) = x - bias;
+	obj_pts.at<double>(0 + index_num, 1) = y + bias;
+
+	obj_pts.at<double>(1 + index_num, 0) = x + bias;
+	obj_pts.at<double>(1 + index_num, 1) = y + bias;
+
+	obj_pts.at<double>(2 + index_num, 0) = x + bias;
+	obj_pts.at<double>(2 + index_num, 1) = y - bias;
+
+	obj_pts.at<double>(3 + index_num, 0) = x - bias;
+	obj_pts.at<double>(3 + index_num, 1) = y - bias;
+}
+
 ipt::IPT_Receiver::IPT_Receiver(
 	const std::string& cam_path,
 	const std::string& map_path,
@@ -158,6 +179,9 @@ void ipt::IPT_Receiver::Demodulate(
 	const cv::Mat& img_nxt, 
 	zarray_t*& detections)
 {
+
+	tag_exist_flag = false;
+
 	img_org[0] = img_pre;
 	img_org[1] = img_now;
 	img_org[2] = img_nxt;
@@ -169,7 +193,7 @@ void ipt::IPT_Receiver::Demodulate(
 	for (int i = 0; i < 3; i++)
 		GetLightnessCh(img_org[i], img_lightness[i]);
 
-	cv::Mat sub = Substraction(img_org[0], img_org[1]);
+	cv::Mat sub = Substraction(img_lightness[0], img_lightness[1]);
 	Preprocess(sub);
 
 	int ret = Detection(sub, detections);
@@ -186,7 +210,7 @@ void ipt::IPT_Receiver::Demodulate(
 		return;
 	}
 
-	sub = Substraction(img_org[1], img_org[2]);
+	sub = Substraction(img_lightness[1], img_lightness[2]);
 	Preprocess(sub);
 	ret = Detection(sub, detections);
 	if (ret > 0)
@@ -201,4 +225,39 @@ void ipt::IPT_Receiver::Demodulate(
 		tag_exist_flag = true;
 		return;
 	}
+}
+
+void ipt::IPT_Receiver::EstimatePose(zarray_t*& detections, cv::Vec3d& position, cv::Vec3d& angle)
+{
+	if (!tag_exist_flag)
+		return;
+
+	cv::Mat R_w_c, R_c_w, rvec, tvec;
+	cv::Mat obj_pts = cv::Mat::zeros(4 * zarray_size(detections), 3, CV_64FC1);
+	cv::Mat img_pts = cv::Mat::zeros(4 * zarray_size(detections), 2, CV_64FC1);
+
+	for (size_t i = 0; i < zarray_size(detections); ++i)
+	{
+		const int index_num = 4 * i;
+		apriltag_detection_t* det;
+		zarray_get(detections, i, &det);
+		LookupMap(index_num, det->id, obj_pts);
+
+		for (int j = 0; j < 4; j++)
+			for (int k = 0; k < 2; k++)
+				img_pts.at<double>(index_num + j, k) = det->p[3 - j][k] / scale_factor;
+	}
+
+	cv::solvePnP(obj_pts, img_pts, cam_mtx, cam_dist, rvec, tvec, false, SOLVEPNP_IPPE);
+
+	cv::Rodrigues(rvec, R_w_c);
+	cv::transpose(R_w_c, R_c_w);
+
+	// TODO : Change tvec to use the result from MAVROS
+	cv::Mat p = -R_c_w * tvec;
+	position[0] = p.at<double>(0, 0);
+	position[1] = p.at<double>(1, 0);
+	position[2] = p.at<double>(2, 0);
+	angle = rotation_2_euler(R_c_w);
+
 }

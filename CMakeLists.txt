@@ -9,7 +9,7 @@ if(NOT ("/opt/ros/noetic" IN_LIST CMAKE_PREFIX_PATH))
 	# Set the prefix for ROS
 	list(APPEND CMAKE_PREFIX_PATH "~/ncatkin_ws/devel")
 	list(APPEND CMAKE_PREFIX_PATH "/opt/ros/noetic")
-	set(catkin_DIR /opt/ros/noetic/share/catkin/cmake)
+	set(catkin_DIR "/opt/ros/noetic/share/catkin/cmake")
 	if("/opt/ros/noetic" IN_LIST CMAKE_PREFIX_PATH)
 		MESSAGE("Envrionment setup succeeded")
 	endif()
@@ -55,27 +55,35 @@ include_directories("ros/include")
 add_executable(IPT_cpp 
 	main.cpp 
 	${DIR_SRC} 
-	${DIR_INCLUDE}
+	#${DIR_INCLUDE}
 )
-
-# make sure to place target_link_libraries after the add_executable command,
-# so that CMake actually builds the target before linking the library.
 target_link_libraries(IPT_cpp 
 	${apriltag_LIBRARIES} 
 	${OpenCV_LIBS} 
 	${CMAKE_THREAD_LIBS_INIT}
 	nlohmann_json::nlohmann_json
 )
-#MESSAGE("OpenCV_LIBS: " ${OpenCV_LIBS})  #display opencv libs found
+
+add_executable(ipt_estimation_test
+	tests/ipt_refactor_test.cpp
+	${DIR_SRC}
+	#${DIR_INCLUDE}
+)
+target_link_libraries(ipt_estimation_test 
+	${apriltag_LIBRARIES} 
+	${OpenCV_LIBS} 
+	${CMAKE_THREAD_LIBS_INIT}
+	nlohmann_json::nlohmann_json
+)
 
 #add_executable(record_video record_video.c src/avilib.c src/v4l2uvc.c include/avilib.h include/uvcvideo.h include/v4l2uvc.h)
 
 add_executable(ipt_node 
 	main_ros.cpp
 	${DIR_SRC}
-	${DIR_INCLUDE}
+	#${DIR_INCLUDE}
 	${DIR_ROS_SRC}
-	${DIR_ROS_INCLUDE}
+	#${DIR_ROS_INCLUDE}
 )
 target_link_libraries(ipt_node
 	${apriltag_LIBRARIES} 
