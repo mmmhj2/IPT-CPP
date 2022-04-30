@@ -16,7 +16,7 @@ namespace ipt
 {
 	class IPT_Receiver
 	{
-	private:
+	protected:
 		cv::Mat cam_mtx, cam_dist;
 		MapInfo map_info;
 
@@ -32,7 +32,7 @@ namespace ipt
 	public:
 		bool tag_exist_flag;
 
-	private:
+	protected:
 		static void
 			GetLightnessCh(const cv::Mat& img_bgr, cv::Mat& img_lightness);
 		// Align two img
@@ -54,19 +54,19 @@ namespace ipt
 			const std::string& map_path,
 			int w, int h,
 			double scale_f = 1);
-		~IPT_Receiver();
+		virtual ~IPT_Receiver();
 
-		void Demodulate(const cv::Mat& img_pre, 
+		virtual void Demodulate(const cv::Mat& img_pre, 
 			const cv::Mat& img_now, 
 			const cv::Mat& img_nxt, 
 			zarray_t*& detections);
 
-		void EstimatePose(zarray_t*& detections, 
+		virtual void EstimatePose(zarray_t*& detections, 
 			cv::Vec3d& position, 
 			cv::Vec3d& angle);
 
 		// Estimate the pose, but use an orientation supplied externally
-		void EstimatePoseWithOrientation(zarray_t*& detections,
+		virtual void EstimatePoseWithOrientation(zarray_t*& detections,
 			cv::Vec3d& position,
 			cv::Vec3d& angle,
 			cv::Vec3d& orientation);

@@ -195,7 +195,7 @@ void ipt::IPT_Receiver::Demodulate(
 
 	cv::Mat sub = Substraction(img_lightness[0], img_lightness[1]);
 	Preprocess(sub);
-
+	
 	int ret = Detection(sub, detections);
 	if (ret > 0)
 	{
@@ -227,7 +227,11 @@ void ipt::IPT_Receiver::Demodulate(
 	}
 }
 
-void ipt::IPT_Receiver::EstimatePose(zarray_t*& detections, cv::Vec3d& position, cv::Vec3d& angle)
+void 
+ipt::IPT_Receiver::EstimatePose(
+	zarray_t*& detections, 
+	cv::Vec3d& position, 
+	cv::Vec3d& angle)
 {
 	if (!tag_exist_flag)
 		return;
@@ -260,4 +264,14 @@ void ipt::IPT_Receiver::EstimatePose(zarray_t*& detections, cv::Vec3d& position,
 	position[2] = p.at<double>(2, 0);
 	angle = rotation_2_euler(R_c_w);
 
+}
+
+void 
+ipt::IPT_Receiver::EstimatePoseWithOrientation(
+	zarray_t*& detections, 
+	cv::Vec3d& position, 
+	cv::Vec3d& angle, 
+	cv::Vec3d& orientation)
+{
+	// TODO : STUB
 }

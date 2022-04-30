@@ -5,6 +5,7 @@
 */
 
 #include "ipt_receiver_new.h"
+#include "ipt_receiver_par.h"
 #include "ipt_receiver.h"
 
 #include <string>
@@ -75,6 +76,8 @@ int main(int argc, char* argv[])
 	auto end_timer = std::chrono::steady_clock::now();
 	detectionLog << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_timer - start_timer).count() << " ms" << std::endl;
 	detectionLog.close();
+
+	// Refactored
 	detectionLog.open("refactored.log");
 
 	vCap.open(VIDEONAME);
@@ -107,6 +110,41 @@ int main(int argc, char* argv[])
 	}
 	end_timer = std::chrono::steady_clock::now();
 	detectionLog << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_timer - start_timer).count() << " ms" << std::endl;
-	
+	detectionLog.close();
+
+	// Refactored parallel
+	detectionLog.open("refactored_par.log");
+
+	vCap.open(VIDEONAME);
+	SuccessfulCnt = 0, frameCnt = 1;
+	ipt::IPT_Receiver_Parallel refactored_par(CAM_PARA_PATH, MAP_PARA_PATH, WIDTH, HEIGHT, SCALE_F);
+
+	start_timer = std::chrono::steady_clock::now();
+	while (SuccessfulCnt < 100)
+	{
+		frameCnt += 3;
+		vCap >> f_pre >> f_now >> f_nxt;
+		if (f_nxt.empty() || f_now.empty() || f_pre.empty())
+		{
+			std::cout << "The end of the video has been reached, but no estimation is succeeded" << std::endl;
+			break;
+		}
+
+		refactored_par.Demodulate(f_pre, f_now, f_nxt, detections);
+		refactored_par.EstimatePose(detections, position, angle);
+
+		if (refactored_par.tag_exist_flag)
+		{
+			//printf("Successful at frame %d, (%f, %f, %f), (%f, %f, %f)\n",
+			//	frameCnt, position[0], position[1], position[2], angle[0], angle[1], angle[2]);
+			detectionLog << "At frame " << frameCnt << " "
+				<< "(" << position[0] << "," << position[1] << "," << position[2] << ") "
+				<< "(" << angle[0] << "," << angle[1] << "," << angle[2] << ")" << std::endl;
+			SuccessfulCnt++;
+		}
+	}
+	end_timer = std::chrono::steady_clock::now();
+	detectionLog << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_timer - start_timer).count() << " ms" << std::endl;
+
 	return 0;
 }
