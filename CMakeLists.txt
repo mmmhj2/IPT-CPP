@@ -36,6 +36,9 @@ aux_source_directory(. DIR_ROOT)
 aux_source_directory(./src DIR_SRC)
 aux_source_directory(./include DIR_INCLUDE)
 
+aux_source_directory(./ros/include DIR_ROS_INCLUDE)
+aux_source_directory(./ros/src DIR_ROS_SRC)
+
 # 指定生成目标，可以指定多个. 有executable和library等等。
 set(apriltag_INCLUDE_DIRS "${apriltag_INCLUDE_DIRS}/apriltag")
 
@@ -43,9 +46,11 @@ link_directories(${apriltag_LIBDIR})
 
 include_directories(${apriltag_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
-include_directories("include")
 include_directories("/usr/include/nlohmann")
 include_directories(${catkin_INCLUDE_DIRS})
+
+include_directories("include")
+include_directories("ros/include")
 
 add_executable(IPT_cpp 
 	main.cpp 
@@ -69,6 +74,8 @@ add_executable(ipt_node
 	main_ros.cpp
 	${DIR_SRC}
 	${DIR_INCLUDE}
+	${DIR_ROS_SRC}
+	${DIR_ROS_INCLUDE}
 )
 target_link_libraries(ipt_node
 	${apriltag_LIBRARIES} 
