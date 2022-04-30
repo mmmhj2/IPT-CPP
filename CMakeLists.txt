@@ -2,9 +2,28 @@ cmake_minimum_required(VERSION 3.15)  # CMake version check
 project(IPT_cpp)  # Create project "simple_example"
 set(CMAKE_CXX_STANDARD 14)  # Enable c++14 standard
 
+if(NOT ("/opt/ros/noetic" IN_LIST CMAKE_PREFIX_PATH))
+	MESSAGE("Catkin envrionment is not defined.")
+	# Set the location of ROS python packages
+	set(ENV{PYTHONPATH} "/opt/ros/noetic/lib/python3/dist-packages")
+	# Set the prefix for ROS
+	list(APPEND CMAKE_PREFIX_PATH "~/ncatkin_ws/devel")
+	list(APPEND CMAKE_PREFIX_PATH "/opt/ros/noetic")
+	set(catkin_DIR /opt/ros/noetic/share/catkin/cmake)
+	if("/opt/ros/noetic" IN_LIST CMAKE_PREFIX_PATH)
+		MESSAGE("Envrionment setup succeeded")
+	endif()
+else()
+	MESSAGE("Catkin envrionment is already initialized.")
+endif()
+
 find_package(OpenCV REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Threads)
+
+find_package(catkin REQUIRED COMPONENTS
+	roscpp roslib
+)
 
 find_package(PkgConfig)
 pkg_search_module(apriltag REQUIRED apriltag)
@@ -26,6 +45,7 @@ include_directories(${apriltag_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories("include")
 include_directories("/usr/include/nlohmann")
+include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(IPT_cpp 
 	main.cpp 
@@ -43,4 +63,17 @@ target_link_libraries(IPT_cpp
 )
 #MESSAGE("OpenCV_LIBS: " ${OpenCV_LIBS})  #display opencv libs found
 
-add_executable(record_video record_video.c src/avilib.c src/v4l2uvc.c include/avilib.h include/uvcvideo.h include/v4l2uvc.h)
+#add_executable(record_video record_video.c src/avilib.c src/v4l2uvc.c include/avilib.h include/uvcvideo.h include/v4l2uvc.h)
+
+add_executable(ipt_node 
+	main_ros.cpp
+	${DIR_SRC}
+	${DIR_INCLUDE}
+)
+target_link_libraries(ipt_node
+	${apriltag_LIBRARIES} 
+	${OpenCV_LIBS} 
+	${CMAKE_THREAD_LIBS_INIT}
+	nlohmann_json::nlohmann_json
+	${catkin_LIBRARIES}
+)
