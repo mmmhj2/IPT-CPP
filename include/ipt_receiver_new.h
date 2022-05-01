@@ -29,7 +29,8 @@ namespace ipt
 		cv::Mat img_org[3];
 		cv::Mat img_lightness[3];
 
-		int height, width;
+		uint32_t openSz, closeSz;
+		uint32_t height, width;
 		double scale_f_params, scale_factor;
 		
 	public:
@@ -59,9 +60,11 @@ namespace ipt
 	public:
 		IPT_Receiver(const std::string& cam_path,
 			const std::string& map_path,
-			int w, int h,
+			uint32_t w, uint32_t h,
 			double scale_f = 1);
 		virtual ~IPT_Receiver();
+
+		void SetMorphKernelSize(uint32_t open, uint32_t close);
 
 		virtual void Demodulate(const cv::Mat& img_pre, 
 			const cv::Mat& img_now, 

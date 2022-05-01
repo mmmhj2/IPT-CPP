@@ -101,11 +101,11 @@ ipt::IPT_Receiver::Preprocess(cv::Mat& img_sub)
 	cv::threshold(img_sub, img_sub, threshold, 255, cv::THRESH_BINARY);
 	cv::medianBlur(img_sub, img_sub, kSize);
 
-	cv::Size kernelSize{ int(6 * scale_f_params), int(6 * scale_f_params) };
+	cv::Size kernelSize{ int(openSz * scale_f_params), int(openSz * scale_f_params) };
 	cv::Mat kernel{ cv::Mat::ones(kernelSize, CV_8UC1) };
 	cv::morphologyEx(img_sub, img_sub, cv::MORPH_OPEN, kernel);
 
-	kernelSize = cv::Size{ int(15 * scale_f_params), int(15 * scale_f_params) };
+	kernelSize = cv::Size{ int(closeSz * scale_f_params), int(closeSz * scale_f_params) };
 	kernel = cv::Mat::ones(kernelSize, CV_8UC1);
 	cv::morphologyEx(img_sub, img_sub, cv::MORPH_CLOSE, kernel);
 }
@@ -169,7 +169,7 @@ void ipt::IPT_Receiver::LookupMap(int index_num, int idx, cv::Mat& obj_pts)
 ipt::IPT_Receiver::IPT_Receiver(
 	const std::string& cam_path,
 	const std::string& map_path,
-	int w, int h, double scale_f)
+	uint32_t w, uint32_t h, double scale_f)
 {
 	scale_factor = scale_f;
 	width = w * scale_f;
@@ -182,6 +182,8 @@ ipt::IPT_Receiver::IPT_Receiver(
 	cam_mtx = cv::Mat(3, 3, CV_64F);
 	cam_dist = cv::Mat(1, 5, CV_64F);
 	ipt::read_cam_para(cam_path, cam_mtx, cam_dist);
+
+	this->SetMorphKernelSize(6, 15);
 	
 	map_info = ipt::read_map_info(map_path);
 	td = apriltag_detector_create();
@@ -193,6 +195,11 @@ ipt::IPT_Receiver::~IPT_Receiver()
 {
 	tag36h11_destroy(tf);
 	apriltag_detector_destroy(td);
+}
+
+void ipt::IPT_Receiver::SetMorphKernelSize(uint32_t open, uint32_t close)
+{
+	openSz = open, closeSz = close;
 }
 
 void ipt::IPT_Receiver::Demodulate(
