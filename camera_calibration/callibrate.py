@@ -13,8 +13,8 @@ criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 grid_w = 9  # TODO: change
 grid_h = 6  # TODO: change
 
-img_dir = "../camera_calibration/80d_640x360/"  # TODO: change
-params_file = "../params/cam_para_80d_640x360.json"  # TODO: change
+img_dir = "../camera_calibration/cam_new/"  # TODO: change
+params_file = "../params/cam_new.json"  # TODO: change
 
 objp = np.zeros((grid_h * grid_w, 3), np.float32)
 objp[:, :2] = np.mgrid[0:grid_w, 0:grid_h].T.reshape(-1, 2)

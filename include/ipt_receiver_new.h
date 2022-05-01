@@ -17,6 +17,9 @@ namespace ipt
 	class IPT_Receiver
 	{
 	protected:
+
+		constexpr static double PRJ_SCALE_F = 0.08 / 0.18;
+
 		cv::Mat cam_mtx, cam_dist;
 		MapInfo map_info;
 

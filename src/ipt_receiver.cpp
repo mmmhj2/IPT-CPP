@@ -544,9 +544,13 @@ void IPTReceiver::estimate_pose(zarray_t *&detections, Vec3d &position, Vec3d &a
 }
 
 void IPTReceiver::_lookup_map(int index_num, int idx, Mat &obj_pts) {
-    double bias = map_info.layout[idx].size / 2.;
-    double x = map_info.layout[idx].x;
-    double y = map_info.layout[idx].y;
+
+    // Scale incurred by projection
+    constexpr static double PROJECTION_SCALE_F = 0.08 / 0.18;
+
+    double bias = map_info.layout[idx].size / 2. * PROJECTION_SCALE_F;
+    double x = map_info.layout[idx].x * PROJECTION_SCALE_F;
+    double y = map_info.layout[idx].y * PROJECTION_SCALE_F;
 
     // this order is consistent with the required order of IPPE_SQUARE method.
     obj_pts.at<double>(0 + index_num, 0) = x - bias;

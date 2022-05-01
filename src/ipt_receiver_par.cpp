@@ -94,5 +94,5 @@ void ipt::IPT_Receiver_Parallel::Demodulate(const cv::Mat& img_pre, const cv::Ma
 	}
 
 	for (int i = 0; i < 4; i++)
-		zarray_destroy(dets[i]);
+		detectionFutures[i].wait(), zarray_destroy(dets[i]);
 }

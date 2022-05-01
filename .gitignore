@@ -32,9 +32,9 @@
 *.app
 
 /videos/*
-/camera_calibration/8*
-/camera_calibration/9*
+/camera_calibration/*
 /cmake-build-*-pi_4b
 /.idea
 /.vs
 /out
+/build

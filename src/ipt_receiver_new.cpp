@@ -126,9 +126,9 @@ int ipt::IPT_Receiver::Detection(const cv::Mat& img, zarray_t *& detections)
 
 void ipt::IPT_Receiver::LookupMap(int index_num, int idx, cv::Mat& obj_pts)
 {
-	double bias = map_info.layout[idx].size / 2.;
-	double x = map_info.layout[idx].x;
-	double y = map_info.layout[idx].y;
+	double bias = map_info.layout[idx].size / 2. * PRJ_SCALE_F;
+	double x = map_info.layout[idx].x * PRJ_SCALE_F;
+	double y = map_info.layout[idx].y * PRJ_SCALE_F;
 
 	// this order is consistent with the required order of IPPE_SQUARE method.
 	obj_pts.at<double>(0 + index_num, 0) = x - bias;
