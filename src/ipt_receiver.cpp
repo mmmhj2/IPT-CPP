@@ -388,9 +388,9 @@ void IPTReceiver::_preprocess(Mat &img_sub) {
 
     // 4) morphology
     // Morphology open, to remove some noise.
-    Mat kernel = Mat::ones(int(6 * scale_f_params), int(6 * scale_f_params), CV_8UC1);
+    Mat kernel = Mat::ones(int(4 * scale_f_params), int(4 * scale_f_params), CV_8UC1);
     cv::morphologyEx(img_sub, img_sub, cv::MORPH_OPEN, kernel);
-    kernel = Mat::ones(int(15 * scale_f_params), int(15 * scale_f_params), CV_8UC1);
+    kernel = Mat::ones(int(12 * scale_f_params), int(12 * scale_f_params), CV_8UC1);
     cv::morphologyEx(img_sub, img_sub, cv::MORPH_CLOSE, kernel);
 
 //    clock_t time_4 = clock();

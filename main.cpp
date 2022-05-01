@@ -111,6 +111,7 @@ int main() {
     int cnt = 0;
     clock_t time_start = clock();
 
+    cout << "initialization succeeded!" << endl;
     for (;;) {
         clock_t time_0 = clock();
         // get 3 successive frames
@@ -148,8 +149,8 @@ int main() {
         cout << "id = " << cnt << "; ";
 
         clock_t time_3 = clock();
-        cout << "time = " << (double) (time_3 - time_start) / CLOCKS_PER_SEC << "s; ";
-        cout << "speed = " << CLOCKS_PER_SEC / (double) (time_3 - time_0) << " fps; ";
+        //cout << "time = " << (double) (time_3 - time_start) / CLOCKS_PER_SEC << "s; ";
+        //cout << "speed = " << CLOCKS_PER_SEC / (double) (time_3 - time_0) << " fps; ";
 
         if (receiver.tag_exist_flag) {
             cout << "x = " << position[0] << "; "
@@ -161,6 +162,7 @@ int main() {
 
             // UDP
             
+            /*
             json j;
             j["name"] = "uav_0";
             j["x"] = position[0];
@@ -178,10 +180,10 @@ int main() {
                 cout << "Msg sent!";
             } else {
                 cout << "UDP sent failed!";
-            }
+            }*/
             
         }
-        cout << endl;
+        //cout << endl;
 
         cnt++;
 //        if (cnt == 1000) {
