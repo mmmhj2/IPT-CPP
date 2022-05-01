@@ -34,8 +34,8 @@ namespace ipt {
     double median_mat(cv::Mat Input, int nVals);
 
     Vec3d rotation_2_euler(Mat &R);
-
     Vec4d rotation_2_quaternion(Mat &R);
+    Vec4d euler_2_quaternion(Vec3d& E);
 }
 
 #endif //IPT_CPP_TOOLS_H

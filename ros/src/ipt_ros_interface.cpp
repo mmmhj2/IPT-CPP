@@ -75,3 +75,8 @@ void IPT_ROSInterface::WaitAndSpin()
 	pRate->sleep();
 	ros::spin();
 }
+
+ros::NodeHandle* IPT::IPT_ROSInterface::GetPrivateNH()
+{
+	return pnh.get();
+}

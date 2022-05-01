@@ -177,4 +177,16 @@ namespace ipt {
 
         return Vec4d(e0, e1, e2, e3);
     }
+    Vec4d euler_2_quaternion(Vec3d& E)
+    {
+        const double& roll = E[0];
+        const double& pitch = E[1];
+        const double& yaw = E[2];
+        double w, x, y, z;
+        x = sin(roll / 2) * cos(pitch / 2) * cos(yaw / 2) - cos(roll / 2) * sin(pitch / 2) * sin(yaw / 2);
+        y = cos(roll / 2) * sin(pitch / 2) * cos(yaw / 2) + sin(roll / 2) * cos(pitch / 2) * sin(yaw / 2);
+        z = cos(roll / 2) * cos(pitch / 2) * sin(yaw / 2) - sin(roll / 2) * sin(pitch / 2) * cos(yaw / 2);
+        w = cos(roll / 2) * cos(pitch / 2) * cos(yaw / 2) + sin(roll / 2) * sin(pitch / 2) * sin(yaw / 2);
+        return Vec4d(w, x, y, z);
+    }
 }

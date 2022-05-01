@@ -26,6 +26,7 @@ namespace IPT
 
 		// ros::Rate has no default constructor, so we use a pointer
 		std::unique_ptr<ros::Rate> pRate;
+		std::unique_ptr<ros::NodeHandle> nh, pnh;
 
 		void OrientationCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
 
@@ -36,7 +37,6 @@ namespace IPT
 		IPT_ROSInterface(int argc, char* argv[], const std::string& node_name);
 
 		static IPT_ROSInterface* instance;
-		std::unique_ptr<ros::NodeHandle> nh, pnh;
 	public:
 		virtual ~IPT_ROSInterface();
 
@@ -51,6 +51,8 @@ namespace IPT
 		void PublishPose(geometry_msgs::PoseStamped& pose);
 		void GetEstimatedPose(geometry_msgs::PoseStamped& pose) const;
 		void WaitAndSpin();
+
+		ros::NodeHandle* GetPrivateNH();
 	};
 }
 
