@@ -41,6 +41,8 @@ namespace ipt
 		// Align two img
 		std::pair<int, int> AlignImg(const cv::Mat& img_lig_pre,
 			const cv::Mat& img_lig_new, int nSample = 3);
+
+		std::pair <cv::Mat, cv::Mat> GetRTVector(zarray_t *& detections);
 		// Process the img_sub before detection
 		// Including normalizing, blurring, thresholding and morph operations
 		void Preprocess(cv::Mat& img_sub);
@@ -51,6 +53,8 @@ namespace ipt
 		int Detection(const cv::Mat & img, zarray_t*& detections);
 		// Search for the coordinate of the given apriltag
 		void LookupMap(int index_num, int idx, cv::Mat& obj_pts);
+
+		
 
 	public:
 		IPT_Receiver(const std::string& cam_path,
@@ -72,7 +76,7 @@ namespace ipt
 		virtual void EstimatePoseWithOrientation(zarray_t*& detections,
 			cv::Vec3d& position,
 			cv::Vec3d& angle,
-			cv::Vec3d& orientation);
+			const cv::Mat& rotationMat);
 	};
 }
 

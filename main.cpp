@@ -42,13 +42,14 @@ int main() {
     const string cam_para_path = "./params/cam_para_80d_1280x720.json";  // be careful to choose: /cam_para_80d_1280x720.json, /cam_para_90d_640x360.json
     // 最初的0530数据用的应该是/cam_para_80d_1280x720.json，飞机实际飞行用的应该是/cam_para_80d_640x360.json
     // 之前买过90d的，但是因为镜头变了，出现了严重的彩色闪烁，导致数据没法用。
-    bool use_camera = false;
-    double scale_f = 1.0;   // 0.5, 1.0
-    int set_width = 640;   // 1280, 640
-    int set_height = 360;   // 720, 360
+    bool use_camera = true;
+    double scale_f = 0.5;   // 0.5, 1.0
+    int set_width = 1280;   // 1280, 640
+    int set_height = 720;   // 720, 360
 
     /* init */
     // UDP
+    /*
     int sockfd;
     char buffer[MAXLINE];
     struct sockaddr_in servaddr;
@@ -63,6 +64,7 @@ int main() {
         perror("socket creation failed");
         exit(EXIT_FAILURE);
     }
+    */
 
     // opencv
     VideoCapture cap;
@@ -191,6 +193,7 @@ int main() {
 //        }
 
     }
+    /*
     char msg[] = "quit";
     sendto(sockfd, (const char *) msg, strlen(msg), MSG_CONFIRM, (const struct sockaddr *) &servaddr,
            sizeof(servaddr));
@@ -201,6 +204,7 @@ int main() {
          << endl;
 
     close(sockfd);
+    */
     return 0;
 }
 

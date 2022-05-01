@@ -65,6 +65,28 @@ ipt::IPT_Receiver::AlignImg(
 	return std::make_pair(offset_x, offset_y);
 }
 
+std::pair<cv::Mat, cv::Mat> ipt::IPT_Receiver::GetRTVector(zarray_t*& detections)
+{
+	cv::Mat rvec, tvec;
+	cv::Mat obj_pts = cv::Mat::zeros(4 * zarray_size(detections), 3, CV_64FC1);
+	cv::Mat img_pts = cv::Mat::zeros(4 * zarray_size(detections), 2, CV_64FC1);
+
+	for (size_t i = 0; i < zarray_size(detections); ++i)
+	{
+		const int index_num = 4 * i;
+		apriltag_detection_t* det;
+		zarray_get(detections, i, &det);
+		LookupMap(index_num, det->id, obj_pts);
+
+		for (int j = 0; j < 4; j++)
+			for (int k = 0; k < 2; k++)
+				img_pts.at<double>(index_num + j, k) = det->p[3 - j][k] / scale_factor;
+	}
+
+	cv::solvePnP(obj_pts, img_pts, cam_mtx, cam_dist, rvec, tvec, false, SOLVEPNP_IPPE);
+	return std::make_pair(rvec, tvec);
+}
+
 void 
 ipt::IPT_Receiver::Preprocess(cv::Mat& img_sub)
 {
@@ -236,28 +258,12 @@ ipt::IPT_Receiver::EstimatePose(
 	if (!tag_exist_flag)
 		return;
 
-	cv::Mat R_w_c, R_c_w, rvec, tvec;
-	cv::Mat obj_pts = cv::Mat::zeros(4 * zarray_size(detections), 3, CV_64FC1);
-	cv::Mat img_pts = cv::Mat::zeros(4 * zarray_size(detections), 2, CV_64FC1);
-
-	for (size_t i = 0; i < zarray_size(detections); ++i)
-	{
-		const int index_num = 4 * i;
-		apriltag_detection_t* det;
-		zarray_get(detections, i, &det);
-		LookupMap(index_num, det->id, obj_pts);
-
-		for (int j = 0; j < 4; j++)
-			for (int k = 0; k < 2; k++)
-				img_pts.at<double>(index_num + j, k) = det->p[3 - j][k] / scale_factor;
-	}
-
-	cv::solvePnP(obj_pts, img_pts, cam_mtx, cam_dist, rvec, tvec, false, SOLVEPNP_IPPE);
+	cv::Mat R_c_w, R_w_c, rvec, tvec;
+	std::tie(rvec, tvec) = this->GetRTVector(detections);
 
 	cv::Rodrigues(rvec, R_w_c);
 	cv::transpose(R_w_c, R_c_w);
 
-	// TODO : Change tvec to use the result from MAVROS
 	cv::Mat p = -R_c_w * tvec;
 	position[0] = p.at<double>(0, 0);
 	position[1] = p.at<double>(1, 0);
@@ -271,7 +277,17 @@ ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	zarray_t*& detections, 
 	cv::Vec3d& position, 
 	cv::Vec3d& angle, 
-	cv::Vec3d& orientation)
+	const cv::Mat& rotationMat)
 {
-	// TODO : STUB
+	cv::Mat R_c_w, R_w_c, rvec, tvec;
+	std::tie(rvec, tvec) = this->GetRTVector(detections);
+
+	cv::Rodrigues(rotationMat, R_w_c);
+	cv::transpose(R_w_c, R_c_w);
+
+	cv::Mat p = -R_c_w * tvec;
+	position[0] = p.at<double>(0, 0);
+	position[1] = p.at<double>(1, 0);
+	position[2] = p.at<double>(2, 0);
+	angle = rotation_2_euler(R_c_w);
 }

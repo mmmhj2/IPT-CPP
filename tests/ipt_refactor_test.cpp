@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 	end_timer = std::chrono::steady_clock::now();
 	detectionLog << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_timer - start_timer).count() << " ms" << std::endl;
 	detectionLog.close();
-
+#ifdef TEST_PARALLEL
 	// Refactored parallel
 	detectionLog.open("refactored_par.log");
 
@@ -145,6 +145,7 @@ int main(int argc, char* argv[])
 	}
 	end_timer = std::chrono::steady_clock::now();
 	detectionLog << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_timer - start_timer).count() << " ms" << std::endl;
-
+	detectionLog.close();
+#endif
 	return 0;
 }
