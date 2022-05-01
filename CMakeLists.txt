@@ -76,6 +76,13 @@ target_link_libraries(ipt_estimation_test
 	nlohmann_json::nlohmann_json
 )
 
+add_executable(video_capture_test
+	tests/video_test.cpp
+)
+target_link_libraries(video_capture_test
+	${OpenCV_LIBS}
+)
+
 #add_executable(record_video record_video.c src/avilib.c src/v4l2uvc.c include/avilib.h include/uvcvideo.h include/v4l2uvc.h)
 
 add_executable(ipt_node 
