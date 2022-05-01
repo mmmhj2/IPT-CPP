@@ -28,9 +28,11 @@ int main(int argc, char * argv[])
 	cout << "Setting properites to desired value ..." << endl;
 
 	bool result;
-	result = vCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 360);
+	result = vCapture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+	result &= vCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 360);
 	result &= vCapture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
 	result &= vCapture.set(cv::CAP_PROP_FPS, 120);
+	
 
 	if (!result)
 		cout << "Failed to set properities" << endl;
