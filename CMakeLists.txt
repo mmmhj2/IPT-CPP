@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.15)  # CMake version check
 project(ipt_cpp)  # Create project "simple_example"
 set(CMAKE_CXX_STANDARD 14)  # Enable c++14 standard
 
+# Specify build type
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+	MESSAGE(WARNING "Build type unspecified, default to release")
+	set(CMAKE_BUILD_TYPE "Release")
+endif()
+MESSAGE("Build type:" ${CMAKE_BUILD_TYPE})
+
+# Set up envrionments
 if(NOT ("/opt/ros/noetic" IN_LIST CMAKE_PREFIX_PATH))
 	MESSAGE("Catkin envrionment is not defined.")
 	# Set the location of ROS python packages
@@ -21,8 +29,11 @@ find_package(OpenCV REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Threads)
 
+# Configuration for catkin
 find_package(catkin REQUIRED COMPONENTS
 	roscpp roslib
+)
+catkin_package(
 )
 
 find_package(PkgConfig)
@@ -30,9 +41,6 @@ pkg_search_module(apriltag REQUIRED apriltag)
 #find_package(apriltag REQUIRED)
 #find_package(nlohmann_json REQUIRED)
 
-# Configuration for catkin
-catkin_package(
-)
 
 # 查找当前目录下的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
@@ -68,25 +76,6 @@ target_link_libraries(IPT_cpp
 	nlohmann_json::nlohmann_json
 )
 
-add_executable(ipt_estimation_test
-	tests/ipt_refactor_test.cpp
-	${DIR_SRC}
-	#${DIR_INCLUDE}
-)
-target_link_libraries(ipt_estimation_test 
-	${apriltag_LIBRARIES} 
-	${OpenCV_LIBS} 
-	${CMAKE_THREAD_LIBS_INIT}
-	nlohmann_json::nlohmann_json
-)
-
-add_executable(video_capture_test
-	tests/video_test.cpp
-)
-target_link_libraries(video_capture_test
-	${OpenCV_LIBS}
-)
-
 #add_executable(record_video record_video.c src/avilib.c src/v4l2uvc.c include/avilib.h include/uvcvideo.h include/v4l2uvc.h)
 
 add_executable(ipt_node 
@@ -103,3 +92,34 @@ target_link_libraries(ipt_node
 	nlohmann_json::nlohmann_json
 	${catkin_LIBRARIES}
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	
+	MESSAGE(NOTICE "Generating unit tests")
+	add_executable(ipt_estimation_test
+		tests/ipt_refactor_test.cpp
+		${DIR_SRC}
+		#${DIR_INCLUDE}
+	)
+	target_link_libraries(ipt_estimation_test 
+		${apriltag_LIBRARIES} 
+		${OpenCV_LIBS} 
+		${CMAKE_THREAD_LIBS_INIT}
+		nlohmann_json::nlohmann_json
+	)
+
+	add_executable(video_capture_test
+		tests/video_test.cpp
+	)
+	target_link_libraries(video_capture_test
+		${OpenCV_LIBS}
+	)
+
+	add_executable(rotation_convertion_test
+		tests/rotation_test.cpp
+		src/tools.cpp
+	)
+	target_link_libraries(rotation_convertion_test
+		${OpenCV_LIBS}
+	)
+endif()

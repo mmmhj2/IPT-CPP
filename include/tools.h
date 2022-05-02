@@ -36,6 +36,9 @@ namespace ipt {
     Vec3d rotation_2_euler(Mat &R);
     Vec4d rotation_2_quaternion(Mat &R);
     Vec4d euler_2_quaternion(Vec3d& E);
+    
+    Mat quaternion_2_rotation(Vec4d& Q);
+    Mat quaternion_2_rotation(double w, double x, double y, double z);
 }
 
 #endif //IPT_CPP_TOOLS_H

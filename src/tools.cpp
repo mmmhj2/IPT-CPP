@@ -192,4 +192,26 @@ namespace ipt {
         w = cos(roll / 2) * cos(pitch / 2) * cos(yaw / 2) + sin(roll / 2) * sin(pitch / 2) * sin(yaw / 2);
         return Vec4d(w, x, y, z);
     }
+
+    Mat quaternion_2_rotation(Vec4d& Q)
+    {
+        return quaternion_2_rotation(Q[0], Q[1], Q[2], Q[3]);
+    }
+
+    Mat quaternion_2_rotation(double w, double x, double y, double z)
+    {
+        cv::Mat rotation(3, 3, CV_64F);
+
+        rotation.at<double>(0, 0) = 1 - 2 * y * y - 2 * z * z;
+        rotation.at<double>(0, 1) = 2 * x * y + 2 * w * z;
+        rotation.at<double>(0, 2) = 2 * x * z - 2 * w * y;
+        rotation.at<double>(1, 0) = 2 * x * y - 2 * w * z;
+        rotation.at<double>(1, 1) = 1 - 2 * x * x - 2 * z * z;
+        rotation.at<double>(1, 2) = 2 * y * z + 2 * w * x;
+        rotation.at<double>(2, 0) = 2 * x * z + 2 * w * y;
+        rotation.at<double>(2, 1) = 2 * y * z - 2 * w * x;
+        rotation.at<double>(2, 2) = 1 - 2 * x * x - 2 * y * y;
+
+        return rotation;
+    }
 }
