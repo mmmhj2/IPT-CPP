@@ -9,10 +9,12 @@ using json = nlohmann::json;
 
 namespace ipt {
 
-    void read_cam_para(const std::string &cam_path, Mat &cam_mtx, Mat &cam_dist) {
+    int read_cam_para(const std::string &cam_path, Mat &cam_mtx, Mat &cam_dist) {
         // Read camera params from a json file.
         // Method 1: using nlohmann::json library.
         std::ifstream in_file(cam_path);
+        if (!in_file.good())
+            return -1;
         json cam_para;
         in_file >> cam_para;
         in_file.close();
@@ -29,6 +31,7 @@ namespace ipt {
                 cam_dist.at<double>(i, j) = cam_para["dist"][i][j];
             }
         }
+        return 0;
     }
 
     struct MapInfo read_map_info(const std::string &map_path) {

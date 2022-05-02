@@ -27,7 +27,7 @@ struct MapInfo {
 };
 
 namespace ipt {
-    void read_cam_para(const std::string &cam_path, Mat &cam_mtx, Mat &cam_dist);
+    int read_cam_para(const std::string &cam_path, Mat &cam_mtx, Mat &cam_dist);
 
     struct MapInfo read_map_info(const std::string &map_path);
 
