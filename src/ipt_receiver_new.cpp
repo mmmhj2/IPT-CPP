@@ -11,7 +11,7 @@ ipt::IPT_Receiver::GetLightnessCh(
 	const cv::Mat& img_bgr,
 	cv::Mat& img_lightness)
 {
-	cv::Mat tMat;
+	cv::Mat tMat = img_bgr;
 	std::vector<cv::Mat> channels(3);
 
 	cv::cvtColor(img_bgr, tMat, COLOR_BGR2Lab);
@@ -177,7 +177,7 @@ ipt::IPT_Receiver::IPT_Receiver(
 	scale_f_params = width / 1280.;
 
 	for (int i = 0; i < 3; i++)
-		img_org[i] = cv::Mat{ h, w, CV_8UC3 }, img_lightness[i] = cv::Mat{ h, w, CV_16SC1 };
+		img_org[i] = cv::Mat{ h, w, CV_8UC3 }, img_lightness[i] = cv::Mat{ height, width, CV_16SC1 };
 
 	cam_mtx = cv::Mat(3, 3, CV_64F);
 	cam_dist = cv::Mat(1, 5, CV_64F);

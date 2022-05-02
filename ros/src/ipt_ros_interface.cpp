@@ -14,7 +14,7 @@ IPT_ROSInterface::IPT_ROSInterface(int argc, char* argv[], const std::string& nn
 	// and therefore it's not desirable to use delegating constructors
 	nh.reset(new ros::NodeHandle());
 	pnh.reset(new ros::NodeHandle("~"));
-	pRate.reset(new ros::Rate(20));
+	pRate.reset(new ros::Rate(120));
 
 	poseSeq = 0;
 	//poseFrameName = "map";
@@ -73,7 +73,7 @@ void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::PoseStamped& pose) const
 void IPT_ROSInterface::WaitAndSpin()
 {
 	pRate->sleep();
-	ros::spin();
+	ros::spinOnce();
 }
 
 ros::NodeHandle* IPT::IPT_ROSInterface::GetPrivateNH()

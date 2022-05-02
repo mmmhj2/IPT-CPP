@@ -19,19 +19,17 @@ int main(int argc, char * argv[])
 	double scale_f;
 	std::string deviceFile, mapFile, camParamFile;
 	pInterface->GetPrivateNH()->param<bool>("UseMavrosPose", bUseMavrosPose, false);
-	pInterface->GetPrivateNH()->param<int>("MorphOpenSz", morphOpenSz, 6);
-	pInterface->GetPrivateNH()->param<int>("MorphCloseSz", morphCloseSz, 15);
+	pInterface->GetPrivateNH()->param<int>("MorphOpenSz", morphOpenSz, 4);
+	pInterface->GetPrivateNH()->param<int>("MorphCloseSz", morphCloseSz, 12);
 	pInterface->GetPrivateNH()->param<int>("VideoHeight", height, 720);
-	pInterface->GetPrivateNH()->param<int>("VideoWidth", width, 1080);
+	pInterface->GetPrivateNH()->param<int>("VideoWidth", width, 1280);
 	pInterface->GetPrivateNH()->param<double>("VideoScaleFactor", scale_f, 0.5);
 	pInterface->GetPrivateNH()->param<std::string>("DeviceFile", deviceFile, "/dev/video0");
 	pInterface->GetPrivateNH()->param<std::string>("MapFile", mapFile, "params/map_info_9x9.json");
 	pInterface->GetPrivateNH()->param<std::string>("CameraParameterFile", camParamFile, "params/cam_new.json");
 
-	//ROS_WARN_STREAM("Camera file set to " << camParamFile);
-	std::cerr << "Camera : " << camParamFile << std::endl;
-	std::cerr << "Map : " << mapFile << std::endl;
-	//ROS_WARN_STREAM("Map file set to " << mapFile);
+	ROS_INFO_STREAM("Camera file set to " << camParamFile);
+	ROS_INFO_STREAM("Map file set to " << mapFile);
 
 	// Create video capture
 	ROS_INFO("Setting up video capture...");
@@ -99,7 +97,13 @@ int main(int argc, char * argv[])
 		}
 
 		receiver.Demodulate(f_pre, f_now, f_nxt, detections);
+		if (!receiver.tag_exist_flag)
+		{
+			pInterface->WaitAndSpin();
+			continue;
+		}
 		
+		ROS_INFO_THROTTLE(1, "Demodulation successful");
 		if (!bUseMavrosPose)
 		{
 			receiver.EstimatePose(detections, position, angle);
