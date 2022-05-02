@@ -1,0 +1,16 @@
+﻿<package format="2">
+	<name>ipt_cpp</name>
+	<version>1.0.0</version>
+	<description>
+		The package for IPT with ROS
+	</description>
+	<maintainer email="placeholder@placeholder.com">placeholder</maintainer>
+	<license>placeholder</license>
+	<buildtool_depend>catkin</buildtool_depend>
+
+	<build_depend>roscpp</build_depend>
+	<build_depend>roslib</build_depend>
+
+	<exec_depend>roscpp</exec_depend>
+	<exec_depend>roslib</exec_depend>
+</package>

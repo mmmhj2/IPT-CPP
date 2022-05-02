@@ -4,7 +4,7 @@
 
 using namespace IPT;
 
-IPT_ROSInterface* IPT_ROSInterface::instance;
+IPT_ROSInterface* IPT_ROSInterface::instance = nullptr;
 
 IPT_ROSInterface::IPT_ROSInterface(int argc, char* argv[], const std::string& nname)
 {

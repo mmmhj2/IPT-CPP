@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)  # CMake version check
-project(IPT_cpp)  # Create project "simple_example"
+project(ipt_cpp)  # Create project "simple_example"
 set(CMAKE_CXX_STANDARD 14)  # Enable c++14 standard
 
 if(NOT ("/opt/ros/noetic" IN_LIST CMAKE_PREFIX_PATH))
@@ -29,6 +29,10 @@ find_package(PkgConfig)
 pkg_search_module(apriltag REQUIRED apriltag)
 #find_package(apriltag REQUIRED)
 #find_package(nlohmann_json REQUIRED)
+
+# Configuration for catkin
+catkin_package(
+)
 
 # 查找当前目录下的所有源文件
 # 并将名称保存到 DIR_SRCS 变量

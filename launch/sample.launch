@@ -1,0 +1,10 @@
+<launch>
+	<node pkg="ipt_cpp" type="ipt_node" name="ipt_node" output="screen">
+		<param name="OrientationSubscriberNodeName" type="string" value="mavros/local_position/pose"/>
+		<param name="PosePublisherNodeName" type="string" value="ipt/pose"/>
+		<param name="PoseFrameName" type="string" value="map"/>
+		<param name="DeviceFile" type="string" value="/dev/video0"/>
+		<param name="MapFile" type="string" value="$(find ipt_cpp)/params/map_info_9x9.json"/>
+		<param name="CameraParameterFile" type="string" value="$(find ipt_cpp)/params/cam_new.json"/>
+	</node>
+</launch>

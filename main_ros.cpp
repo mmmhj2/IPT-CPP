@@ -9,6 +9,10 @@ int main(int argc, char * argv[])
 
 	IPT::IPT_ROSInterface* pInterface = IPT::IPT_ROSInterface::GetInstance(argc, argv);
 
+	char * dirPtr = get_current_dir_name();
+	ROS_INFO_STREAM("Current working directory : " << dirPtr);
+	free(dirPtr);
+
 	bool bUseMavrosPose;
 	int morphOpenSz, morphCloseSz;
 	int height, width;
@@ -24,12 +28,18 @@ int main(int argc, char * argv[])
 	pInterface->GetPrivateNH()->param<std::string>("MapFile", mapFile, "params/map_info_9x9.json");
 	pInterface->GetPrivateNH()->param<std::string>("CameraParameterFile", camParamFile, "params/cam_new.json");
 
+	//ROS_WARN_STREAM("Camera file set to " << camParamFile);
+	std::cerr << "Camera : " << camParamFile << std::endl;
+	std::cerr << "Map : " << mapFile << std::endl;
+	//ROS_WARN_STREAM("Map file set to " << mapFile);
+
 	// Create video capture
+	ROS_INFO("Setting up video capture...");
 	cv::VideoCapture vCapture{ deviceFile };
 	if (!vCapture.isOpened())
 	{
 		ROS_FATAL_STREAM("Cannot open video device : " << deviceFile);
-		ros::shutdown();
+		return -1;
 	}
 
 	// Set properities
@@ -41,8 +51,29 @@ int main(int argc, char * argv[])
 	if (!isPropSet)
 	{
 		ROS_FATAL("Cannot set properity of the stream");
-		ros::shutdown();
+		return -1;
 	}
+
+	// Test existence of parameter files
+	ROS_INFO("Testing parameter files...");
+	do{
+		std::ifstream finTest;
+		finTest.open(camParamFile);
+		if (!finTest)
+		{
+			ROS_FATAL_STREAM("Cannot open camera configuration file " << camParamFile);
+			return -1;
+		}
+		finTest.close();
+		finTest.open(mapFile);
+		if (!finTest)
+		{
+			ROS_FATAL_STREAM("Cannot open map configuration file " << mapFile);
+			return -1;
+		}
+		finTest.close();
+	} while (0);	// Guard with while(0) to eliminate unnecessary declarations
+
 
 	// Ready to receive and demodulate
 	ipt::IPT_Receiver receiver{camParamFile, mapFile, width, height, scale_f};
@@ -56,6 +87,7 @@ int main(int argc, char * argv[])
 	Vec3d position;
 	Vec3d angle;
 
+	ROS_INFO("Ready to demodulate");
 	while (ros::ok())
 	{
 		ros::Time frameTime = ros::Time::now();
