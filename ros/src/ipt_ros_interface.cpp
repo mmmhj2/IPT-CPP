@@ -2,7 +2,7 @@
 
 #include <functional>
 
-using namespace IPT;
+using namespace ipt;
 
 IPT_ROSInterface* IPT_ROSInterface::instance = nullptr;
 
@@ -26,6 +26,7 @@ IPT_ROSInterface::IPT_ROSInterface(int argc, char* argv[], const std::string& nn
 void IPT_ROSInterface::ReadParameters()
 {
 	pnh->param<std::string>("OrientationSubscriberNodeName", this->orientationSubscriberNodeName, "mavros/local_position/pose");
+	pnh->param<std::string>("ImuSubscriberNodeName", this->imuSubscriberNodeName, "mavros/imu/data");
 	pnh->param<std::string>("PosePublisherNodeName", this->posePublisherNodeName, "ipt_node/pose");
 	pnh->param<std::string>("PoseFrameName", this->poseFrameName, "map");
 }
@@ -33,10 +34,14 @@ void IPT_ROSInterface::ReadParameters()
 void IPT_ROSInterface::ConstructNodes()
 {
 	// Use std::bind + std::mem_fn to call a member function statically
-	std::function<void(const geometry_msgs::PoseStampedConstPtr&)> BoundCallback 
+	std::function<void(const geometry_msgs::PoseStampedConstPtr&)> BoundCallbackPose
 		= std::bind(std::mem_fn(&IPT_ROSInterface::OrientationCallback), this, std::placeholders::_1);
+	std::function<void(const sensor_msgs::ImuConstPtr&)> BoundCallbackImu
+		= std::bind(std::mem_fn(&IPT_ROSInterface::ImuCallback), this, std::placeholders::_1);
 	this->orientationSubscriber
-		= nh->subscribe<geometry_msgs::PoseStamped>(this->orientationSubscriberNodeName, 10, BoundCallback);
+		= nh->subscribe<geometry_msgs::PoseStamped>(this->orientationSubscriberNodeName, 10, BoundCallbackPose);
+	this->quatSubscriber
+		= nh->subscribe<sensor_msgs::Imu>(this->imuSubscriberNodeName, 10, BoundCallbackImu);
 	this->posePublisher
 		= nh->advertise<geometry_msgs::PoseStamped>(this->posePublisherNodeName, 10);
 }
@@ -44,6 +49,11 @@ void IPT_ROSInterface::ConstructNodes()
 void IPT_ROSInterface::OrientationCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
 	this->CurrentPose = *msg;
+}
+
+void IPT_ROSInterface::ImuCallback(const sensor_msgs::Imu::ConstPtr& msg)
+{
+	this->ImuQuat = msg->orientation;
 }
 
 IPT_ROSInterface::~IPT_ROSInterface()
@@ -65,9 +75,9 @@ void IPT_ROSInterface::PublishPose(geometry_msgs::PoseStamped& pose)
 	this->posePublisher.publish(pose);
 }
 
-void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::PoseStamped& pose) const
+void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::Quaternion& quat) const
 {
-	pose = this->CurrentPose;
+	quat = this->ImuQuat;
 }
 
 void IPT_ROSInterface::WaitAndSpin()
@@ -76,7 +86,7 @@ void IPT_ROSInterface::WaitAndSpin()
 	ros::spinOnce();
 }
 
-ros::NodeHandle* IPT::IPT_ROSInterface::GetPrivateNH()
+ros::NodeHandle* ipt::IPT_ROSInterface::GetPrivateNH()
 {
 	return pnh.get();
 }

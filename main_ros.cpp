@@ -7,11 +7,16 @@
 int main(int argc, char * argv[])
 {
 
-	IPT::IPT_ROSInterface* pInterface = IPT::IPT_ROSInterface::GetInstance(argc, argv);
+	ipt::IPT_ROSInterface* pInterface = ipt::IPT_ROSInterface::GetInstance(argc, argv);
 
 	char * dirPtr = get_current_dir_name();
 	ROS_INFO_STREAM("Current working directory : " << dirPtr);
 	free(dirPtr);
+
+	cv::Mat R_b_c{ cv::Mat::zeros(3, 3, CV_64F) };
+	R_b_c.at<double>(0, 1) = -1;
+	R_b_c.at<double>(1, 0) = -1;
+	R_b_c.at<double>(0, 1) = -1;
 
 	bool bUseMavrosPose;
 	int morphOpenSz, morphCloseSz;
@@ -86,6 +91,7 @@ int main(int argc, char * argv[])
 	Vec3d angle;
 
 	ROS_INFO("Ready to demodulate");
+
 	while (ros::ok())
 	{
 		ros::Time frameTime = ros::Time::now();
@@ -111,6 +117,11 @@ int main(int argc, char * argv[])
 		else
 		{
 			// TODO : Use mavros pose
+			geometry_msgs::Quaternion quat;
+			pInterface->GetEstimatedPose(quat);
+			cv::Mat rotationMat = ipt::quaternion_2_rotation(quat.w, quat.x, quat.y, quat.z);
+			rotationMat = rotationMat * R_b_c;
+			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat);
 		}
 
 		geometry_msgs::PoseStamped posePub;

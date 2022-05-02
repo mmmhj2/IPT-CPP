@@ -11,7 +11,7 @@ ipt::IPT_Receiver::GetLightnessCh(
 	const cv::Mat& img_bgr,
 	cv::Mat& img_lightness)
 {
-	cv::Mat tMat = img_bgr;
+	cv::Mat tMat;
 	std::vector<cv::Mat> channels(3);
 
 	cv::cvtColor(img_bgr, tMat, COLOR_BGR2Lab);
@@ -286,11 +286,18 @@ ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	cv::Vec3d& angle, 
 	const cv::Mat& rotationMat)
 {
-	cv::Mat R_c_w, R_w_c, rvec, tvec;
+	cv::Mat R_c_w, rvec, tvec;
 	std::tie(rvec, tvec) = this->GetRTVector(detections);
 
-	cv::Rodrigues(rotationMat, R_w_c);
-	cv::transpose(R_w_c, R_c_w);
+	// Discard rvec and use supplied rotation matrix
+	if (!(rotationMat.rows == 3 && rotationMat.cols == 3))
+	{
+		cv::Mat R_w_c;
+		cv::Rodrigues(rotationMat, R_w_c);
+		cv::transpose(R_w_c, R_c_w);
+	}
+	else
+		cv::transpose(rotationMat, R_c_w);
 
 	cv::Mat p = -R_c_w * tvec;
 	position[0] = p.at<double>(0, 0);

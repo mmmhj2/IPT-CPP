@@ -5,8 +5,9 @@
 #include <string>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <sensor_msgs/Imu.h>
 
-namespace IPT
+namespace ipt
 {
 	/*
 	* IPT_ROSInterface : A naive singleton used for ROS operations
@@ -15,20 +16,23 @@ namespace IPT
 	{
 	private:
 		std::string orientationSubscriberNodeName;
+		std::string imuSubscriberNodeName;
 		std::string posePublisherNodeName;
 		std::string poseFrameName;
 		uint32_t poseSeq;
 
 		geometry_msgs::PoseStamped CurrentPose;
+		geometry_msgs::Quaternion ImuQuat;
 
 		ros::Publisher posePublisher;
-		ros::Subscriber orientationSubscriber;
+		ros::Subscriber orientationSubscriber, quatSubscriber;
 
 		// ros::Rate has no default constructor, so we use a pointer
 		std::unique_ptr<ros::Rate> pRate;
 		std::unique_ptr<ros::NodeHandle> nh, pnh;
 
 		void OrientationCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
+		void ImuCallback(const sensor_msgs::Imu::ConstPtr& msg);
 
 		void ReadParameters();
 		void ConstructNodes();
@@ -49,7 +53,7 @@ namespace IPT
 
 		// Modify the header of the pose and then publish it
 		void PublishPose(geometry_msgs::PoseStamped& pose);
-		void GetEstimatedPose(geometry_msgs::PoseStamped& pose) const;
+		void GetEstimatedPose(geometry_msgs::Quaternion& quat) const;
 		void WaitAndSpin();
 
 		ros::NodeHandle* GetPrivateNH();
