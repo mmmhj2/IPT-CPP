@@ -111,38 +111,57 @@ int main(int argc, char * argv[])
 		}
 		
 		ROS_INFO_THROTTLE(1, "Demodulation successful");
-		if (!bUseMavrosPose)
-		{
-			receiver.EstimatePose(detections, position, angle);
-		}
-		else
-		{
-			// TODO : Use mavros pose
-			geometry_msgs::Quaternion quat;
-			pInterface->GetEstimatedPose(quat);
-			rotationMat = ipt::quaternion_2_rotation(quat.w, quat.x, quat.y, quat.z);
-			cv::transpose(R_b_c * rotationMat, rotationMat);
-			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat);
-		}
 
 		geometry_msgs::PoseStamped posePub;
 		cv::Vec4d quat;
 
-		posePub.header.stamp = frameTime;
-		posePub.pose.position.x = position[0];
-		posePub.pose.position.y = position[1];
-		posePub.pose.position.z = position[2];
-		
 		if (!bUseMavrosPose)
-			quat = ipt::euler_2_quaternion(angle);
-		else
-			quat = ipt::rotation_2_quaternion(rotationMat);
+		{
+			receiver.EstimatePose(detections, position, angle);
 
-		posePub.pose.orientation.w = quat[0];
-		posePub.pose.orientation.x = quat[1];
-		posePub.pose.orientation.y = quat[2];
-		posePub.pose.orientation.z = quat[3];
-		pInterface->PublishPose(posePub);
+			posePub.header.stamp = frameTime;
+			posePub.pose.position.x = position[0];
+			posePub.pose.position.y = position[1];
+			posePub.pose.position.z = position[2];
+			quat = ipt::euler_2_quaternion(angle);
+			posePub.pose.orientation.w = quat[0];
+			posePub.pose.orientation.x = quat[1];
+			posePub.pose.orientation.y = quat[2];
+			posePub.pose.orientation.z = quat[3];
+			pInterface->PublishPose(posePub);
+		}
+		else
+		{
+			// TODO : Use mavros pose
+			geometry_msgs::Quaternion ros_quat;
+			geometry_msgs::PoseStamped pose_raw;
+			cv::Vec3d posr, angler;
+
+			pInterface->GetEstimatedPose(ros_quat);
+			rotationMat = ipt::quaternion_2_rotation(ros_quat.w, ros_quat.x, ros_quat.y, ros_quat.z);
+			cv::transpose(R_b_c * rotationMat, rotationMat);
+			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat, posr, angler);
+
+			posePub.header.stamp = frameTime;
+			pose_raw.header.stamp = frameTime;
+			posePub.pose.position.x = position[0];
+			pose_raw.pose.position.x = position[0];
+			posePub.pose.position.y = position[1];
+			pose_raw.pose.position.y = position[1];
+			posePub.pose.position.z = position[2];
+			pose_raw.pose.position.z = position[2];
+			quat = ipt::rotation_2_quaternion(rotationMat);
+			posePub.pose.orientation.w = quat[0];
+			posePub.pose.orientation.x = quat[1];
+			posePub.pose.orientation.y = quat[2];
+			posePub.pose.orientation.z = quat[3];
+			quat = ipt::euler_2_quaternion(angler);
+			pose_raw.pose.orientation.w = quat[0];
+			pose_raw.pose.orientation.x = quat[1];
+			pose_raw.pose.orientation.y = quat[2];
+			pose_raw.pose.orientation.z = quat[3];
+			pInterface->PublishPose(posePub, pose_raw);
+		}
 
 		pInterface->WaitAndSpin();
 	}

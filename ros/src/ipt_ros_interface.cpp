@@ -44,6 +44,8 @@ void IPT_ROSInterface::ConstructNodes()
 		= nh->subscribe<sensor_msgs::Imu>(this->imuSubscriberNodeName, 10, BoundCallbackImu);
 	this->posePublisher
 		= nh->advertise<geometry_msgs::PoseStamped>(this->posePublisherNodeName, 10);
+	this->rawPosePublisher
+		= nh->advertise<geometry_msgs::PoseStamped>(this->posePublisherNodeName + "_raw", 10);
 }
 
 void IPT_ROSInterface::OrientationCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
@@ -73,6 +75,14 @@ void IPT_ROSInterface::PublishPose(geometry_msgs::PoseStamped& pose)
 	pose.header.seq = ++(this->poseSeq);
 	pose.header.frame_id = this->poseFrameName;
 	this->posePublisher.publish(pose);
+}
+
+void IPT_ROSInterface::PublishPose(geometry_msgs::PoseStamped& pose, geometry_msgs::PoseStamped& poseRaw)
+{
+	this->PublishPose(pose);
+	poseRaw.header.seq = (this->poseSeq);
+	poseRaw.header.frame_id = this->poseFrameName;
+	this->rawPosePublisher.publish(poseRaw);
 }
 
 void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::Quaternion& quat) const

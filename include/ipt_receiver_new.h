@@ -80,6 +80,15 @@ namespace ipt
 			cv::Vec3d& position,
 			cv::Vec3d& angle,
 			const cv::Mat& rotationMat);
+
+		// Estimate the pose with an orientation supplied externally
+		// and also output pose estimated with its own orientation 
+		virtual void EstimatePoseWithOrientation(zarray_t*& detections,
+			cv::Vec3d& position,
+			cv::Vec3d& angle,
+			const cv::Mat& rotationMat,
+			cv::Vec3d& positionRaw,
+			cv::Vec3d& angleRaw);
 	};
 }
 

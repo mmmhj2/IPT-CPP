@@ -24,7 +24,7 @@ namespace ipt
 		geometry_msgs::PoseStamped CurrentPose;
 		geometry_msgs::Quaternion ImuQuat;
 
-		ros::Publisher posePublisher;
+		ros::Publisher posePublisher, rawPosePublisher;
 		ros::Subscriber orientationSubscriber, quatSubscriber;
 
 		// ros::Rate has no default constructor, so we use a pointer
@@ -53,6 +53,8 @@ namespace ipt
 
 		// Modify the header of the pose and then publish it
 		void PublishPose(geometry_msgs::PoseStamped& pose);
+		// Modify the header and publish the pose with raw data
+		void PublishPose(geometry_msgs::PoseStamped& pose, geometry_msgs::PoseStamped& raw);
 		void GetEstimatedPose(geometry_msgs::Quaternion& quat) const;
 		void WaitAndSpin();
 

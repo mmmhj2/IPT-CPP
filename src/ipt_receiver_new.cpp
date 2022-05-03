@@ -281,9 +281,9 @@ ipt::IPT_Receiver::EstimatePose(
 
 void 
 ipt::IPT_Receiver::EstimatePoseWithOrientation(
-	zarray_t*& detections, 
-	cv::Vec3d& position, 
-	cv::Vec3d& angle, 
+	zarray_t*& detections,
+	cv::Vec3d& position,
+	cv::Vec3d& angle,
 	const cv::Mat& rotationMat)
 {
 	cv::Mat R_c_w, rvec, tvec;
@@ -296,4 +296,34 @@ ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	position[1] = p.at<double>(1, 0);
 	position[2] = p.at<double>(2, 0);
 	angle = rotation_2_euler(rotationMat);
+}
+
+void ipt::IPT_Receiver::EstimatePoseWithOrientation(
+	zarray_t*& detections,
+	cv::Vec3d& position,
+	cv::Vec3d& angle,
+	const cv::Mat& rotationMat,
+	cv::Vec3d& positionRaw,
+	cv::Vec3d& angleRaw)
+{
+	cv::Mat rvec, tvec;
+	std::tie(rvec, tvec) = this->GetRTVector(detections);
+
+	// Discard rvec and use supplied rotation matrix
+	cv::Mat p = -rotationMat * tvec;
+	position[0] = p.at<double>(0, 0);
+	position[1] = p.at<double>(1, 0);
+	position[2] = p.at<double>(2, 0);
+	angle = rotation_2_euler(rotationMat);
+
+	// Estimate again using own data
+	cv::Mat R_c_w, R_w_c;
+	cv::Rodrigues(rvec, R_w_c);
+	cv::transpose(R_w_c, R_c_w);
+
+	p = -R_c_w * tvec;
+	positionRaw[0] = p.at<double>(0, 0);
+	positionRaw[1] = p.at<double>(1, 0);
+	positionRaw[2] = p.at<double>(2, 0);
+	angleRaw = rotation_2_euler(R_c_w);
 }
