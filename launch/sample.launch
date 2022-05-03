@@ -7,7 +7,7 @@
 		
 		<param name="DeviceFile" type="string" value="/dev/video0"/>
 		<param name="MapFile" type="string" value="$(find ipt_cpp)/params/map_info_15x9.json"/>
-		<param name="CameraParameterFile" type="string" value="$(find ipt_cpp)/params/cam_new.json"/>
+		<param name="CameraParameterFile" type="string" value="$(find ipt_cpp)/params/cam_new_1280x720.json"/>
 		
 		<param name="UseMavrosPose" type="bool" value="true"/>
 		
