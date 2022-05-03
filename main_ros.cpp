@@ -16,7 +16,7 @@ int main(int argc, char * argv[])
 	cv::Mat R_b_c{ cv::Mat::zeros(3, 3, CV_64F) };
 	R_b_c.at<double>(0, 1) = -1;
 	R_b_c.at<double>(1, 0) = -1;
-	R_b_c.at<double>(0, 1) = -1;
+	R_b_c.at<double>(2, 2) = -1;
 
 	bool bUseMavrosPose;
 	int morphOpenSz, morphCloseSz;
@@ -139,22 +139,20 @@ int main(int argc, char * argv[])
 
 			pInterface->GetEstimatedPose(ros_quat);
 			rotationMat = ipt::quaternion_2_rotation(ros_quat.w, ros_quat.x, ros_quat.y, ros_quat.z);
-			cv::transpose(R_b_c * rotationMat, rotationMat);
+			//cv::transpose(R_b_c * rotationMat, rotationMat);
+			rotationMat = rotationMat * R_b_c;
 			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat, posr, angler);
 
 			posePub.header.stamp = frameTime;
 			pose_raw.header.stamp = frameTime;
 			posePub.pose.position.x = position[0];
-			pose_raw.pose.position.x = position[0];
+			pose_raw.pose.position.x = posr[0];
 			posePub.pose.position.y = position[1];
-			pose_raw.pose.position.y = position[1];
+			pose_raw.pose.position.y = posr[1];
 			posePub.pose.position.z = position[2];
-			pose_raw.pose.position.z = position[2];
-			quat = ipt::rotation_2_quaternion(rotationMat);
-			posePub.pose.orientation.w = quat[0];
-			posePub.pose.orientation.x = quat[1];
-			posePub.pose.orientation.y = quat[2];
-			posePub.pose.orientation.z = quat[3];
+			pose_raw.pose.position.z = posr[2];
+			//quat = ipt::rotation_2_quaternion(rotationMat);
+			posePub.pose.orientation = ros_quat;
 			quat = ipt::euler_2_quaternion(angler);
 			pose_raw.pose.orientation.w = quat[0];
 			pose_raw.pose.orientation.x = quat[1];

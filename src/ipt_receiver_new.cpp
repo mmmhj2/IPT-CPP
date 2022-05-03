@@ -295,7 +295,7 @@ ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	position[0] = p.at<double>(0, 0);
 	position[1] = p.at<double>(1, 0);
 	position[2] = p.at<double>(2, 0);
-	angle = rotation_2_euler(rotationMat);
+	//angle = rotation_2_euler(rotationMat);
 }
 
 void ipt::IPT_Receiver::EstimatePoseWithOrientation(
@@ -314,7 +314,7 @@ void ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	position[0] = p.at<double>(0, 0);
 	position[1] = p.at<double>(1, 0);
 	position[2] = p.at<double>(2, 0);
-	angle = rotation_2_euler(rotationMat);
+	//angle = rotation_2_euler(rotationMat);
 
 	// Estimate again using own data
 	cv::Mat R_c_w, R_w_c;

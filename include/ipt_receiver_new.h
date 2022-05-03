@@ -76,6 +76,7 @@ namespace ipt
 			cv::Vec3d& angle);
 
 		// Estimate the pose, but use an orientation supplied externally
+		// Provides no angle estimation
 		virtual void EstimatePoseWithOrientation(zarray_t*& detections,
 			cv::Vec3d& position,
 			cv::Vec3d& angle,
@@ -83,6 +84,7 @@ namespace ipt
 
 		// Estimate the pose with an orientation supplied externally
 		// and also output pose estimated with its own orientation 
+		// Provides no angle estimation
 		virtual void EstimatePoseWithOrientation(zarray_t*& detections,
 			cv::Vec3d& position,
 			cv::Vec3d& angle,
