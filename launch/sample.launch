@@ -17,5 +17,8 @@
 		<param name="VideoHeight" type="int" value="720"/>
 		<param name="VideoWidth" type="int" value="1280"/>
 		<param name="VideoScaleFactor" type="double" value="0.5"/>
+
+		<param name="LoggingResults" type="bool" value="true"/>
+		<param name="LoggingFile" type="string" value="$(find ipt_cpp)/latest.log"/>
 	</node>
 </launch>

@@ -18,11 +18,12 @@ int main(int argc, char * argv[])
 	R_b_c.at<double>(1, 0) = -1;
 	R_b_c.at<double>(2, 2) = -1;
 
-	bool bUseMavrosPose;
+	bool bUseMavrosPose, bLogResult;
 	int morphOpenSz, morphCloseSz;
 	int height, width;
 	double scale_f;
-	std::string deviceFile, mapFile, camParamFile;
+	std::string deviceFile, mapFile, camParamFile, loggingFile;
+	pInterface->GetPrivateNH()->param<bool>("LoggingResults", bLogResult, true);
 	pInterface->GetPrivateNH()->param<bool>("UseMavrosPose", bUseMavrosPose, false);
 	pInterface->GetPrivateNH()->param<int>("MorphOpenSz", morphOpenSz, 4);
 	pInterface->GetPrivateNH()->param<int>("MorphCloseSz", morphCloseSz, 12);
@@ -32,6 +33,7 @@ int main(int argc, char * argv[])
 	pInterface->GetPrivateNH()->param<std::string>("DeviceFile", deviceFile, "/dev/video0");
 	pInterface->GetPrivateNH()->param<std::string>("MapFile", mapFile, "params/map_info_9x9.json");
 	pInterface->GetPrivateNH()->param<std::string>("CameraParameterFile", camParamFile, "params/cam_new.json");
+	pInterface->GetPrivateNH()->param<std::string>("LoggingFile", loggingFile, "results.log");
 
 	ROS_INFO_STREAM("Camera file set to " << camParamFile);
 	ROS_INFO_STREAM("Map file set to " << mapFile);
@@ -91,6 +93,25 @@ int main(int argc, char * argv[])
 	cv::Vec3d angle;
 	cv::Mat rotationMat;
 
+	std::ofstream flog;
+	if (bLogResult)
+	{
+		flog.open(loggingFile);
+		if (!flog.good())
+		{
+			ROS_ERROR_STREAM("Cannot open logging file \"" << loggingFile << "\", no logging is provided.");
+			bLogResult = false;
+		}
+		else
+		{
+			if (!bUseMavrosPose)
+				flog << "X_RAW, Y_RAW, Z_RAW" << std::endl;
+			else
+				flog << "X, Y, Z, X_RAW, Y_RAW, Z_RAW" << std::endl;
+		}
+	}
+		
+
 	ROS_INFO("Ready to demodulate");
 
 	while (ros::ok())
@@ -129,6 +150,9 @@ int main(int argc, char * argv[])
 			posePub.pose.orientation.y = quat[2];
 			posePub.pose.orientation.z = quat[3];
 			pInterface->PublishPose(posePub);
+
+			if (bLogResult)
+				flog << position[0] << "," << position[1] << "," << position[2] << std::endl;
 		}
 		else
 		{
@@ -159,10 +183,17 @@ int main(int argc, char * argv[])
 			pose_raw.pose.orientation.y = quat[2];
 			pose_raw.pose.orientation.z = quat[3];
 			pInterface->PublishPose(posePub, pose_raw);
+
+			if (bLogResult)
+				flog << position[0] << "," << position[1] << "," << position[2] << ","
+				<< posr[0] << "," << posr[1] << "," << posr[2] << std::endl;
 		}
 
 		pInterface->WaitAndSpin();
 	}
+
+	if (flog.is_open())
+		flog.close();
 
 	return 0;
 }
