@@ -14,7 +14,7 @@ ipt::IPT_Receiver::GetLightnessCh(
 	cv::Mat tMat;
 	std::vector<cv::Mat> channels(3);
 
-	cv::cvtColor(img_bgr, tMat, COLOR_BGR2Lab);
+	cv::cvtColor(img_bgr, tMat, cv::COLOR_BGR2Lab);
 	cv::split(tMat, channels);
 	channels[0].convertTo(img_lightness, CV_16SC1);
 }
@@ -45,15 +45,15 @@ ipt::IPT_Receiver::AlignImg(
 		for (int i = 0; i < nSample; ++i)
 		{
 			cv::Mat a_x = horizontal_lines_pre[i].colRange(
-				std::max(offset, 0), width + min(offset, 0));
+				std::max(offset, 0), width + std::min(offset, 0));
 			cv::Mat b_x = horizontal_lines_now[i].colRange(
-				std::max(-offset, 0), width + min(-offset, 0));
+				std::max(-offset, 0), width + std::min(-offset, 0));
 			cv::Mat a_y = vertical_lines_pre[i].rowRange(
-				std::max(offset, 0), height + min(offset, 0));
+				std::max(offset, 0), height + std::min(offset, 0));
 			cv::Mat b_y = vertical_lines_now[i].rowRange(
-				std::max(-offset, 0), height + min(-offset, 0));
-			val_x += cv::norm(a_x, b_x, NORM_L1);
-			val_y += cv::norm(a_y, b_y, NORM_L1);
+				std::max(-offset, 0), height + std::min(-offset, 0));
+			val_x += cv::norm(a_x, b_x, cv::NORM_L1);
+			val_y += cv::norm(a_y, b_y, cv::NORM_L1);
 		}
 		val_x /= nSample, val_y /= nSample;
 		if (val_x < min_x_val)
@@ -83,14 +83,14 @@ std::pair<cv::Mat, cv::Mat> ipt::IPT_Receiver::GetRTVector(zarray_t*& detections
 				img_pts.at<double>(index_num + j, k) = det->p[3 - j][k] / scale_factor;
 	}
 
-	cv::solvePnP(obj_pts, img_pts, cam_mtx, cam_dist, rvec, tvec, false, SOLVEPNP_IPPE);
+	cv::solvePnP(obj_pts, img_pts, cam_mtx, cam_dist, rvec, tvec, false, cv::SOLVEPNP_IPPE);
 	return std::make_pair(rvec, tvec);
 }
 
 void 
 ipt::IPT_Receiver::Preprocess(cv::Mat& img_sub)
 {
-	cv::normalize(img_sub, img_sub, 0, 255, NORM_MINMAX);
+	cv::normalize(img_sub, img_sub, 0, 255, cv::NORM_MINMAX);
 	img_sub.convertTo(img_sub, CV_8U);
 
 	cv::Size bSize{ int(5 * scale_f_params), int(5 * scale_f_params) };
@@ -116,7 +116,7 @@ cv::Mat ipt::IPT_Receiver::Substraction(cv::Mat& img_lightness_1, cv::Mat& img_l
 	cv::Mat warpMat = (cv::Mat_<float>(2, 3) << 1, 0, offset.first, 0, 1, offset.second);
 	cv::warpAffine(
 		img_lightness_2, img_lightness_2, warpMat, 
-		cv::Size(width, height), INTER_NEAREST
+		cv::Size(width, height), cv::INTER_NEAREST
 	);
 
 	cv::Mat sub = img_lightness_2 - img_lightness_1;
@@ -218,7 +218,7 @@ void ipt::IPT_Receiver::Demodulate(
 	if (scale_factor != 1.0)
 		for (int i = 0; i < 3; ++i)
 			cv::resize(img_org[i], img_org[i], cv::Size(), 
-				scale_factor, scale_factor, INTER_LINEAR);
+				scale_factor, scale_factor, cv::INTER_LINEAR);
 	for (int i = 0; i < 3; i++)
 		GetLightnessCh(img_org[i], img_lightness[i]);
 
@@ -290,18 +290,10 @@ ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	std::tie(rvec, tvec) = this->GetRTVector(detections);
 
 	// Discard rvec and use supplied rotation matrix
-	if (!(rotationMat.rows == 3 && rotationMat.cols == 3))
-	{
-		cv::Mat R_w_c;
-		cv::Rodrigues(rotationMat, R_w_c);
-		cv::transpose(R_w_c, R_c_w);
-	}
-	else
-		cv::transpose(rotationMat, R_c_w);
 
-	cv::Mat p = -R_c_w * tvec;
+	cv::Mat p = -rotationMat * tvec;
 	position[0] = p.at<double>(0, 0);
 	position[1] = p.at<double>(1, 0);
 	position[2] = p.at<double>(2, 0);
-	angle = rotation_2_euler(R_c_w);
+	angle = rotation_2_euler(rotationMat);
 }
