@@ -107,7 +107,7 @@ int main(int argc, char * argv[])
 			if (!bUseMavrosPose)
 				flog << "X_RAW, Y_RAW, Z_RAW" << std::endl;
 			else
-				flog << "X, Y, Z, X_RAW, Y_RAW, Z_RAW" << std::endl;
+				flog << "X, Y, Z, X_RAW, Y_RAW, Z_RAW, X_FILTERED, Y_FILTERED, Z_FILTERED" << std::endl;
 		}
 	}
 		
@@ -192,10 +192,13 @@ int main(int argc, char * argv[])
 			pose_uncali.pose.orientation.z = 0;
 
 			pInterface->PublishPose(posePub, pose_raw, pose_uncali);
+			pInterface->GetFilteredPose(pose_raw);
 
 			if (bLogResult)
 				flog << position[0] << "," << position[1] << "," << position[2] << ","
-				<< posr[0] << "," << posr[1] << "," << posr[2] << std::endl;
+				<< posr[0] << "," << posr[1] << "," << posr[2] << ","
+				<< pose_raw.pose.position.x << "," << pose_raw.pose.position.y << "," << pose_raw.pose.position.z
+				<< std::endl ;
 		}
 
 		pInterface->WaitAndSpin();

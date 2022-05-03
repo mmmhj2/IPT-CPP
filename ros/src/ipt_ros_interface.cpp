@@ -95,6 +95,11 @@ void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::Quaternion& quat) const
 	quat = this->ImuQuat;
 }
 
+void IPT_ROSInterface::GetFilteredPose(geometry_msgs::PoseStamped& pose) const
+{
+	pose = this->CurrentPose;
+}
+
 void IPT_ROSInterface::WaitAndSpin()
 {
 	pRate->sleep();

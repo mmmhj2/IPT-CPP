@@ -58,6 +58,7 @@ namespace ipt
 			geometry_msgs::PoseStamped& raw, 
 			geometry_msgs::PoseStamped& uncalibrated);
 		void GetEstimatedPose(geometry_msgs::Quaternion& quat) const;
+		void GetFilteredPose(geometry_msgs::PoseStamped& pose) const;
 		void WaitAndSpin();
 
 		ros::NodeHandle* GetPrivateNH();
