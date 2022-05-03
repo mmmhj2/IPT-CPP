@@ -23,7 +23,11 @@ int main(int argc, char** argv)
 	cv::Vec3d euler = { roll, pitch, yaw };
 
 	auto quat = ipt::euler_2_quaternion(euler);
+	auto rotMat = ipt::quaternion_2_rotation(quat);
+	
 	std::cout << "Euler angle = " << std::endl << euler << std::endl ;
 	std::cout << "Quaterions = " << std::endl << quat << std::endl;
-	std::cout << "Rotation Matrix = " << std::endl << ipt::quaternion_2_rotation(quat) << std::endl;
+	std::cout << "Rotation Matrix = " << std::endl << rotMat << std::endl;
+	std::cout << "Recalculated quaterions = " << std::endl << ipt::rotation_2_quaternion(rotMat) << std::endl;
+	std::cout << "Recalculated euler using matrix = " << std::endl << ipt::rotation_2_euler(rotMat) << std::endl;
 }

@@ -132,11 +132,58 @@ namespace ipt {
     }
 
 
-    // Calculates rotation matrix to quaternion
-    // from the book "Small Unmanned Aircraft Theory and Practice"
     Vec4d rotation_2_quaternion(const Mat &R) {
 
 //        assert(isRotationMatrix(R));
+        using crdouble = const double&;
+        crdouble m00 = R.at<double>(0, 0);
+        crdouble m01 = R.at<double>(0, 1);
+        crdouble m02 = R.at<double>(0, 2);
+        crdouble m10 = R.at<double>(1, 0);
+        crdouble m11 = R.at<double>(1, 1);
+        crdouble m12 = R.at<double>(1, 2);
+        crdouble m20 = R.at<double>(2, 0);
+        crdouble m21 = R.at<double>(2, 1);
+        crdouble m22 = R.at<double>(2, 2);
+
+        double trace = m00 + m11 + m22;
+        double qw, qx, qy, qz;
+
+        if (trace > 0) {
+            double S = sqrt(trace + 1.0) * 2; // S=4*qw 
+            qw = 0.25 * S;
+            qx = (m21 - m12) / S;
+            qy = (m02 - m20) / S;
+            qz = (m10 - m01) / S;
+        }
+        else if ((m00 > m11) & (m00 > m22)) {
+            float S = sqrt(1.0 + m00 - m11 - m22) * 2; // S=4*qx 
+            qw = (m21 - m12) / S;
+            qx = 0.25 * S;
+            qy = (m01 + m10) / S;
+            qz = (m02 + m20) / S;
+        }
+        else if (m11 > m22) {
+            float S = sqrt(1.0 + m11 - m00 - m22) * 2; // S=4*qy
+            qw = (m02 - m20) / S;
+            qx = (m01 + m10) / S;
+            qy = 0.25 * S;
+            qz = (m12 + m21) / S;
+        }
+        else {
+            float S = sqrt(1.0 + m22 - m00 - m11) * 2; // S=4*qz
+            qw = (m10 - m01) / S;
+            qx = (m02 + m20) / S;
+            qy = (m12 + m21) / S;
+            qz = 0.25 * S;
+        }
+
+        return Vec4d{ qw, qx, qy, qz };
+
+
+        /*
+        * // Calculates rotation matrix to quaternion
+    // from the book "Small Unmanned Aircraft Theory and Practice"
 
         double r11 = R.at<double>(0, 0);
         double r12 = R.at<double>(0, 1);
@@ -147,7 +194,6 @@ namespace ipt {
         double r31 = R.at<double>(2, 0);
         double r32 = R.at<double>(2, 1);
         double r33 = R.at<double>(2, 2);
-
         double tmp = r11 + r22 + r33;
 
         double e0, e1, e2, e3;
@@ -178,7 +224,7 @@ namespace ipt {
             e3 = 0.5 * sqrt((pow(r12 - r21, 2) + pow(r13 + r31, 2) + pow(r23 + r32, 2)) / (3 - tmp));
         }
 
-        return Vec4d(e0, e1, e2, e3);
+        return Vec4d(e0, e1, e2, e3);*/
     }
     Vec4d euler_2_quaternion(const Vec3d& E)
     {
@@ -211,6 +257,8 @@ namespace ipt {
         rotation.at<double>(2, 0) = 2 * x * z + 2 * w * y;
         rotation.at<double>(2, 1) = 2 * y * z - 2 * w * x;
         rotation.at<double>(2, 2) = 1 - 2 * x * x - 2 * y * y;
+
+        cv::transpose(rotation, rotation);
 
         return rotation;
     }
