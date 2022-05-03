@@ -1,10 +1,21 @@
 <launch>
 	<node pkg="ipt_cpp" type="ipt_node" name="ipt_node" output="screen">
 		<param name="OrientationSubscriberNodeName" type="string" value="mavros/local_position/pose"/>
+		<param name="ImuSubscriberNodeName" type="string" value="mavros/imu/data"/>
 		<param name="PosePublisherNodeName" type="string" value="ipt/pose"/>
 		<param name="PoseFrameName" type="string" value="map"/>
+		
 		<param name="DeviceFile" type="string" value="/dev/video0"/>
-		<param name="MapFile" type="string" value="$(find ipt_cpp)/params/map_info_9x9.json"/>
+		<param name="MapFile" type="string" value="$(find ipt_cpp)/params/map_info_15x9.json"/>
 		<param name="CameraParameterFile" type="string" value="$(find ipt_cpp)/params/cam_new.json"/>
+		
+		<param name="UseMavrosPose" type="bool" value="true"/>
+		
+		<param name="MorphOpenSz" type="int" value="4"/>
+		<param name="MorphCloseSz" type="int" value="12"/>
+		
+		<param name="VideoHeight" type="int" value="720"/>
+		<param name="VideoWidth" type="int" value="1280"/>
+		<param name="VideoScaleFactor" type="double" value="0.5"/>
 	</node>
 </launch>
