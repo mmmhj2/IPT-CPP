@@ -12,6 +12,8 @@
 #include <chrono>
 #include <opencv4/opencv2/opencv.hpp>
 
+using namespace cv;
+
 constexpr char CAM_PARA_PATH[] = "../../../params/cam_para_80d_1280x720.json";
 constexpr char MAP_PARA_PATH[] = "../../../params/map_info_9x9.json";
 constexpr char VIDEONAME[] = "../../../videos/0530_color_120fps_L=4_9x9_noLight_720p.avi";

@@ -5,6 +5,8 @@ using std::cout;
 using std::endl;
 constexpr char DEVICENAME[] = "/dev/video0";
 
+using namespace cv;
+
 int main(int argc, char * argv[])
 {
 	cv::VideoCapture vCapture{ DEVICENAME };

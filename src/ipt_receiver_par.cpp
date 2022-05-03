@@ -11,7 +11,7 @@ void ipt::IPT_Receiver_Parallel::CopyAndConvert(int index, const cv::Mat& from)
 	this->img_org[index] = from;
 	if (scale_factor != 1.0)
 		cv::resize(img_org[index], img_org[index], cv::Size(),
-			scale_factor, scale_factor, INTER_LINEAR);
+			scale_factor, scale_factor, cv::INTER_LINEAR);
 	GetLightnessCh(img_org[index], img_lightness[index]);
 }
 

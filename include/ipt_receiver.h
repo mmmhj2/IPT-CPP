@@ -23,14 +23,15 @@ Description: file content
 #include <mutex>
 #include <condition_variable>
 
+//using namespace cv;
 
 namespace ipt {
 
     class IPTReceiver {
     private:
         // camera params
-        Mat cam_mtx;
-        Mat cam_dist;
+        cv::Mat cam_mtx;
+        cv::Mat cam_dist;
 
         // map info
         struct MapInfo map_info;
@@ -45,17 +46,17 @@ namespace ipt {
         [[noreturn]] static void *_thread_detect(void *args);
 
         // static: Static members of a class are not associated with the objects of the class.
-        static void _get_lightness_ch(Mat &img, Mat &f_lightness_now);
+        static void _get_lightness_ch(cv::Mat &img, cv::Mat &f_lightness_now);
 
-        static void _align_img(Mat &f_l_pre, Mat &f_l_now, int &offset_x, int &offset_y, int N_sample = 3);
+        static void _align_img(cv::Mat &f_l_pre, cv::Mat &f_l_now, int &offset_x, int &offset_y, int N_sample = 3);
 
-        static void _preprocess(Mat &f_sub);
+        static void _preprocess(cv::Mat &f_sub);
 
-        void _lookup_map(int index_num, int idx, Mat &obj_pts);
+        void _lookup_map(int index_num, int idx, cv::Mat &obj_pts);
 
-        void _demodulate_multi_t(Mat &f_pre, Mat &f_now, Mat &f_nxt, zarray_t *&detections);
+        void _demodulate_multi_t(cv::Mat &f_pre, cv::Mat &f_now, cv::Mat &f_nxt, zarray_t *&detections);
 
-        void _demodulate_one_t(Mat &f_pre, Mat &f_now, Mat &f_nxt, zarray_t *&detections);
+        void _demodulate_one_t(cv::Mat &f_pre, cv::Mat &f_now, cv::Mat &f_nxt, zarray_t *&detections);
 
 
     public:
@@ -66,9 +67,9 @@ namespace ipt {
 
         ~IPTReceiver();
 
-        void demodulate(Mat &f_pre, Mat &f_now, Mat &f_nxt, zarray_t *&detections);
+        void demodulate(cv::Mat &f_pre, cv::Mat &f_now, cv::Mat &f_nxt, zarray_t *&detections);
 
-        void estimate_pose(zarray_t *&detections, Vec3d &position, Vec3d &angle);
+        void estimate_pose(zarray_t *&detections, cv::Vec3d &position, cv::Vec3d &angle);
 
     };
 }

@@ -82,13 +82,14 @@ int main(int argc, char * argv[])
 	ipt::IPT_Receiver receiver{camParamFile, mapFile, width, height, scale_f};
 	receiver.SetMorphKernelSize(morphOpenSz, morphCloseSz);
 
-	Mat f_pre(height, width, CV_8UC3);
-	Mat f_now(height, width, CV_8UC3);
-	Mat f_nxt(height, width, CV_8UC3);
+	cv::Mat f_pre(height, width, CV_8UC3);
+	cv::Mat f_now(height, width, CV_8UC3);
+	cv::Mat f_nxt(height, width, CV_8UC3);
 
 	zarray_t* detections;
-	Vec3d position;
-	Vec3d angle;
+	cv::Vec3d position;
+	cv::Vec3d angle;
+	cv::Mat rotationMat;
 
 	ROS_INFO("Ready to demodulate");
 
@@ -119,17 +120,24 @@ int main(int argc, char * argv[])
 			// TODO : Use mavros pose
 			geometry_msgs::Quaternion quat;
 			pInterface->GetEstimatedPose(quat);
-			cv::Mat rotationMat = ipt::quaternion_2_rotation(quat.w, quat.x, quat.y, quat.z);
-			rotationMat = rotationMat * R_b_c;
+			rotationMat = ipt::quaternion_2_rotation(quat.w, quat.x, quat.y, quat.z);
+			cv::transpose(R_b_c * rotationMat, rotationMat);
 			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat);
 		}
 
 		geometry_msgs::PoseStamped posePub;
+		cv::Vec4d quat;
+
 		posePub.header.stamp = frameTime;
 		posePub.pose.position.x = position[0];
 		posePub.pose.position.y = position[1];
 		posePub.pose.position.z = position[2];
-		auto quat = ipt::euler_2_quaternion(angle);
+		
+		if (!bUseMavrosPose)
+			quat = ipt::euler_2_quaternion(angle);
+		else
+			quat = ipt::rotation_2_quaternion(rotationMat);
+
 		posePub.pose.orientation.w = quat[0];
 		posePub.pose.orientation.x = quat[1];
 		posePub.pose.orientation.y = quat[2];

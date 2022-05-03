@@ -100,7 +100,7 @@ namespace ipt {
 
     /* from the website: https://learnopencv.com/rotation-matrix-to-euler-angles/ */
     // Checks if a matrix is a valid rotation matrix.
-    bool isRotationMatrix(Mat &R) {
+    bool isRotationMatrix(const Mat &R) {
         Mat Rt;
         transpose(R, Rt);
         Mat shouldBeIdentity = Rt * R;
@@ -110,7 +110,7 @@ namespace ipt {
     }
 
     // Calculates rotation matrix to euler angles in Z-Y-X order.
-    Vec3d rotation_2_euler(Mat &R) {
+    Vec3d rotation_2_euler(const Mat &R) {
 
 //        assert(isRotationMatrix(R));
 
@@ -134,7 +134,7 @@ namespace ipt {
 
     // Calculates rotation matrix to quaternion
     // from the book "Small Unmanned Aircraft Theory and Practice"
-    Vec4d rotation_2_quaternion(Mat &R) {
+    Vec4d rotation_2_quaternion(const Mat &R) {
 
 //        assert(isRotationMatrix(R));
 
@@ -180,7 +180,7 @@ namespace ipt {
 
         return Vec4d(e0, e1, e2, e3);
     }
-    Vec4d euler_2_quaternion(Vec3d& E)
+    Vec4d euler_2_quaternion(const Vec3d& E)
     {
         const double& roll = E[0];
         const double& pitch = E[1];
@@ -193,7 +193,7 @@ namespace ipt {
         return Vec4d(w, x, y, z);
     }
 
-    Mat quaternion_2_rotation(Vec4d& Q)
+    Mat quaternion_2_rotation(const Vec4d& Q)
     {
         return quaternion_2_rotation(Q[0], Q[1], Q[2], Q[3]);
     }

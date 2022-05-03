@@ -8,6 +8,8 @@
 #include "tools.h"
 #include <random>
 
+using namespace cv;
+
 int main(int argc, char** argv)
 {
 	double roll, pitch, yaw;
