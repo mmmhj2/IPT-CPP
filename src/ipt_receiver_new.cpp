@@ -304,7 +304,8 @@ void ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	cv::Vec3d& angle,
 	const cv::Mat& rotationMat,
 	cv::Vec3d& positionRaw,
-	cv::Vec3d& angleRaw)
+	cv::Vec3d& angleRaw,
+	cv::Vec3d& positionUncal)
 {
 	cv::Mat rvec, tvec;
 	std::tie(rvec, tvec) = this->GetRTVector(detections);
@@ -326,4 +327,8 @@ void ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	positionRaw[1] = p.at<double>(1, 0);
 	positionRaw[2] = p.at<double>(2, 0);
 	angleRaw = rotation_2_euler(R_c_w);
+
+	positionUncal[0] = tvec.at<double>(0, 0);
+	positionUncal[1] = tvec.at<double>(1, 0);
+	positionUncal[2] = tvec.at<double>(2, 0);
 }

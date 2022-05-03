@@ -90,7 +90,8 @@ namespace ipt
 			cv::Vec3d& angle,
 			const cv::Mat& rotationMat,
 			cv::Vec3d& positionRaw,
-			cv::Vec3d& angleRaw);
+			cv::Vec3d& angleRaw,
+			cv::Vec3d& positionUncal);
 	};
 }
 
