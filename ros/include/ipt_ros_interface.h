@@ -20,6 +20,7 @@ namespace ipt
 		std::string posePublisherNodeName;
 		std::string poseFrameName;
 		uint32_t poseSeq;
+		double frequency;
 
 		geometry_msgs::PoseStamped CurrentPose;
 		geometry_msgs::Quaternion ImuQuat;

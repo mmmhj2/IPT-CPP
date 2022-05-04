@@ -14,13 +14,14 @@ IPT_ROSInterface::IPT_ROSInterface(int argc, char* argv[], const std::string& nn
 	// and therefore it's not desirable to use delegating constructors
 	nh.reset(new ros::NodeHandle());
 	pnh.reset(new ros::NodeHandle("~"));
-	pRate.reset(new ros::Rate(120));
 
 	poseSeq = 0;
 	//poseFrameName = "map";
 
 	this->ReadParameters();
 	this->ConstructNodes();
+
+	pRate.reset(new ros::Rate(frequency));
 }
 
 void IPT_ROSInterface::ReadParameters()
@@ -29,6 +30,7 @@ void IPT_ROSInterface::ReadParameters()
 	pnh->param<std::string>("ImuSubscriberNodeName", this->imuSubscriberNodeName, "mavros/imu/data");
 	pnh->param<std::string>("PosePublisherNodeName", this->posePublisherNodeName, "ipt_node/pose");
 	pnh->param<std::string>("PoseFrameName", this->poseFrameName, "map");
+	pnh->param<double>("Frequency", this->frequency, 50.0);
 }
 
 void IPT_ROSInterface::ConstructNodes()
