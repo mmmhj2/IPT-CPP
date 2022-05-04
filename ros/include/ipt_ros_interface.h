@@ -23,6 +23,8 @@ namespace ipt
 		double frequency;
 
 		geometry_msgs::PoseStamped CurrentPose;
+
+		std_msgs::Header ImuHeader;
 		geometry_msgs::Quaternion ImuQuat;
 
 		ros::Publisher posePublisher, rawPosePublisher, uncalibratedPosePublisher;
@@ -59,7 +61,10 @@ namespace ipt
 			geometry_msgs::PoseStamped& raw, 
 			geometry_msgs::PoseStamped& uncalibrated);
 		void GetEstimatedPose(geometry_msgs::Quaternion& quat) const;
+		void GetEstimatedPose(geometry_msgs::Quaternion& quat, std_msgs::Header & header) const;
+
 		void GetFilteredPose(geometry_msgs::PoseStamped& pose) const;
+		
 		void WaitAndSpin();
 
 		ros::NodeHandle* GetPrivateNH();

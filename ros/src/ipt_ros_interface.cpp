@@ -59,6 +59,7 @@ void IPT_ROSInterface::OrientationCallback(const geometry_msgs::PoseStamped::Con
 
 void IPT_ROSInterface::ImuCallback(const sensor_msgs::Imu::ConstPtr& msg)
 {
+	this->ImuHeader = msg->header;
 	this->ImuQuat = msg->orientation;
 }
 
@@ -94,6 +95,12 @@ void IPT_ROSInterface::PublishPose(geometry_msgs::PoseStamped& pose, geometry_ms
 
 void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::Quaternion& quat) const
 {
+	quat = this->ImuQuat;
+}
+
+void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::Quaternion& quat, std_msgs::Header& header) const
+{
+	header = this->ImuHeader;
 	quat = this->ImuQuat;
 }
 

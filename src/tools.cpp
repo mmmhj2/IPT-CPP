@@ -262,4 +262,16 @@ namespace ipt {
 
         return rotation;
     }
+
+    Mat AlignRotationMatrix(const Mat& matrixENU)
+    {
+        // R * R_ENU = R_LOCAL
+        const static Mat matrixLocal = quaternion_2_rotation(Vec4d{ 1, 0, 0, 0 });
+        return matrixLocal * matrixENU.inv();
+    }
+
+    Mat AlignRotationMatrix(const Vec4d& quatENU)
+    {
+        return AlignRotationMatrix(quaternion_2_rotation(quatENU));
+    }
 }

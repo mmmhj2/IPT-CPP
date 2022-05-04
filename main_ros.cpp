@@ -156,13 +156,35 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
+
 			// TODO : Use mavros pose
+			static bool isFirstDemod = true;
+			static cv::Mat alignMat;
+
+			std_msgs::Header ros_header;
 			geometry_msgs::Quaternion ros_quat;
 			geometry_msgs::PoseStamped pose_raw, pose_uncali;
 			cv::Vec3d posr, angler, posUncal;
 
-			pInterface->GetEstimatedPose(ros_quat);
+			pInterface->GetEstimatedPose(ros_quat, ros_header);
+
+			if (std::abs((ros_header.stamp - frameTime).toSec()) > 1)
+			{
+				ROS_WARN("Discarding demodulation due to high delay.");
+				pInterface->WaitAndSpin();
+				continue;
+			}
+
+			// Align the NEU frame with local frame
+			if (isFirstDemod)
+			{
+				isFirstDemod = false;
+				cv::Vec4d cv_quat{ ros_quat.w, ros_quat.x, ros_quat.y, ros_quat.z };
+				alignMat = ipt::AlignRotationMatrix(cv_quat);
+			}
+
 			rotationMat = ipt::quaternion_2_rotation(ros_quat.w, ros_quat.x, ros_quat.y, ros_quat.z);
+			rotationMat = alignMat * rotationMat;
 			//cv::transpose(R_b_c * rotationMat, rotationMat);
 			rotationMat = rotationMat * R_b_c;
 			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat, posr, angler, posUncal);

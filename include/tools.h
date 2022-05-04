@@ -37,6 +37,11 @@ namespace ipt {
     
     cv::Mat quaternion_2_rotation(const cv::Vec4d& Q);
     cv::Mat quaternion_2_rotation(double w, double x, double y, double z);
+
+    // Return a rotation matrix that turns a rotation in ENU frame to local frame
+    // Asserting that the matrixENU is obtained when aligned to local frame
+    cv::Mat AlignRotationMatrix(const cv::Mat& matrixENU);
+    cv::Mat AlignRotationMatrix(const cv::Vec4d& quatENU);
 }
 
 #endif //IPT_CPP_TOOLS_H
