@@ -146,7 +146,7 @@ int ipt::IPT_Receiver::Detection(const cv::Mat& img, zarray_t *& detections)
 	return zarray_size(detections);
 }
 
-void ipt::IPT_Receiver::LookupMap(int index_num, int idx, cv::Mat& obj_pts)
+void ipt::IPT_Receiver::LookupMap(int index_num, int idx, cv::Mat& obj_pts) noexcept
 {
 	double bias = map_info.layout[idx].size / 2. * PRJ_SCALE_F;
 	double x = map_info.layout[idx].x * PRJ_SCALE_F;
@@ -169,7 +169,7 @@ void ipt::IPT_Receiver::LookupMap(int index_num, int idx, cv::Mat& obj_pts)
 ipt::IPT_Receiver::IPT_Receiver(
 	const std::string& cam_path,
 	const std::string& map_path,
-	uint32_t w, uint32_t h, double scale_f)
+	int32_t w, int32_t h, double scale_f)
 {
 	scale_factor = scale_f;
 	width = w * scale_f;
@@ -197,7 +197,7 @@ ipt::IPT_Receiver::~IPT_Receiver()
 	apriltag_detector_destroy(td);
 }
 
-void ipt::IPT_Receiver::SetMorphKernelSize(uint32_t open, uint32_t close)
+void ipt::IPT_Receiver::SetMorphKernelSize(uint32_t open, uint32_t close) noexcept
 {
 	openSz = open, closeSz = close;
 }
