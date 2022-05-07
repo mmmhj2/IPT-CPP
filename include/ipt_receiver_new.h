@@ -64,6 +64,9 @@ namespace ipt
 			double scale_f = 1);
 		virtual ~IPT_Receiver();
 
+		IPT_Receiver(const IPT_Receiver& rhs) = delete;
+		IPT_Receiver& operator = (const IPT_Receiver& rhs) = delete;
+
 		void SetMorphKernelSize(uint32_t open, uint32_t close);
 
 		virtual void Demodulate(cv::Mat img_pre, 
