@@ -13,7 +13,7 @@ namespace ipt
 	class IPT_Receiver_Parallel : public IPT_Receiver
 	{
 	private:
-		void CopyAndConvert(int index, const cv::Mat& from);
+		void CopyAndConvert(int index, cv::Mat from);
 		// Parallel detection
 		int Detection(const cv::Mat & img, zarray_t *& detections);
 
@@ -24,9 +24,9 @@ namespace ipt
 			double scale_f = 1);
 		virtual ~IPT_Receiver_Parallel();
 
-		virtual void Demodulate(const cv::Mat& img_pre,
-			const cv::Mat& img_now,
-			const cv::Mat& img_nxt,
+		virtual void Demodulate(cv::Mat img_pre,
+			cv::Mat img_now,
+			cv::Mat img_nxt,
 			zarray_t*& detections);
 	};
 }

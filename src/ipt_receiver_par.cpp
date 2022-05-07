@@ -6,7 +6,7 @@
 #include "ipt_receiver_par.h"
 #include <future>
 
-void ipt::IPT_Receiver_Parallel::CopyAndConvert(int index, const cv::Mat& from)
+void ipt::IPT_Receiver_Parallel::CopyAndConvert(int index, cv::Mat from)
 {
 	this->img_org[index] = from;
 	if (scale_factor != 1.0)
@@ -41,7 +41,7 @@ ipt::IPT_Receiver_Parallel::~IPT_Receiver_Parallel()
 {
 }
 
-void ipt::IPT_Receiver_Parallel::Demodulate(const cv::Mat& img_pre, const cv::Mat& img_now, const cv::Mat& img_nxt, zarray_t*& detections)
+void ipt::IPT_Receiver_Parallel::Demodulate(cv::Mat img_pre, cv::Mat img_now, cv::Mat img_nxt, zarray_t*& detections)
 {
 	tag_exist_flag = false;
 	auto copy_and_convert_1 = std::async(

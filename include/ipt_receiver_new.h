@@ -66,9 +66,9 @@ namespace ipt
 
 		void SetMorphKernelSize(uint32_t open, uint32_t close);
 
-		virtual void Demodulate(const cv::Mat& img_pre, 
-			const cv::Mat& img_now, 
-			const cv::Mat& img_nxt, 
+		virtual void Demodulate(cv::Mat img_pre, 
+			cv::Mat img_now, 
+			cv::Mat img_nxt, 
 			zarray_t*& detections);
 
 		virtual void EstimatePose(zarray_t*& detections, 

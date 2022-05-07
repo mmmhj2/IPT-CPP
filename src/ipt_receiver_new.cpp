@@ -203,14 +203,16 @@ void ipt::IPT_Receiver::SetMorphKernelSize(uint32_t open, uint32_t close)
 }
 
 void ipt::IPT_Receiver::Demodulate(
-	const cv::Mat& img_pre, 
-	const cv::Mat& img_now, 
-	const cv::Mat& img_nxt, 
+	cv::Mat img_pre, 
+	cv::Mat img_now, 
+	cv::Mat img_nxt, 
 	zarray_t*& detections)
 {
 
 	tag_exist_flag = false;
 
+	// Do not copy the arguments passed by reference explicitly, but let the compiler optimize it
+	// c.f. https://web.archive.org/web/20140113221447/http://cpp-next.com/archive/2009/08/want-speed-pass-by-value/
 	img_org[0] = img_pre;
 	img_org[1] = img_now;
 	img_org[2] = img_nxt;
