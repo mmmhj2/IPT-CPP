@@ -65,7 +65,7 @@ include_directories("include")
 include_directories("ros/include")
 
 add_executable(IPT_cpp 
-	main.cpp 
+	"main/main.cpp" 
 	${DIR_SRC} 
 	#${DIR_INCLUDE}
 )
@@ -79,7 +79,7 @@ target_link_libraries(IPT_cpp
 #add_executable(record_video record_video.c src/avilib.c src/v4l2uvc.c include/avilib.h include/uvcvideo.h include/v4l2uvc.h)
 
 add_executable(ipt_node 
-	main_ros.cpp
+	"main/main_ros.cpp"
 	${DIR_SRC}
 	#${DIR_INCLUDE}
 	${DIR_ROS_SRC}

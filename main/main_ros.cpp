@@ -156,8 +156,6 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-
-			// TODO : Use mavros pose
 			static bool isFirstDemod = true;
 			static cv::Mat alignMat;
 
@@ -189,6 +187,13 @@ int main(int argc, char * argv[])
 			rotationMat = rotationMat * R_b_c;
 			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat, posr, angler, posUncal);
 
+			auto newQuat = ipt::rotation_2_quaternion(rotationMat);
+			ros_quat.w = newQuat[0];
+			ros_quat.x = newQuat[1];
+			ros_quat.y = newQuat[2];
+			ros_quat.z = newQuat[3];
+
+			// Set the pose, calibrated by the rotation filtered by flight control system
 			posePub.header.stamp = frameTime;
 			pose_raw.header.stamp = frameTime;
 			posePub.pose.position.x = position[0];
@@ -196,6 +201,7 @@ int main(int argc, char * argv[])
 			posePub.pose.position.z = position[2];
 			posePub.pose.orientation = ros_quat;
 
+			// Set the raw pose, calibrated by the rotation calculated by estimated rotation matrix
 			quat = ipt::euler_2_quaternion(angler);
 			pose_raw.pose.position.x = posr[0];
 			pose_raw.pose.position.y = posr[1];
@@ -205,6 +211,7 @@ int main(int argc, char * argv[])
 			pose_raw.pose.orientation.y = quat[2];
 			pose_raw.pose.orientation.z = quat[3];
 
+			// Set the raw pose, uncalibrated by the rotation matrix
 			pose_uncali.pose.position.x = posUncal[0];
 			pose_uncali.pose.position.y = posUncal[1];
 			pose_uncali.pose.position.z = posUncal[2];

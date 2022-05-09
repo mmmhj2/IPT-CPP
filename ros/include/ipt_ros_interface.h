@@ -63,6 +63,7 @@ namespace ipt
 		void GetEstimatedPose(geometry_msgs::Quaternion& quat) const;
 		void GetEstimatedPose(geometry_msgs::Quaternion& quat, std_msgs::Header & header) const;
 
+		// Aquire filtered pose from MAVROS
 		void GetFilteredPose(geometry_msgs::PoseStamped& pose) const;
 		
 		void WaitAndSpin();
