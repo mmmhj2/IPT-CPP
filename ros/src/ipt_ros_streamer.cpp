@@ -77,6 +77,16 @@ void IPT_Streamer::InitSocket()
 		ROS_FATAL("Failed to listen on socket, %s", strerror(errno));
 		ros::shutdown();
 	}
+
+	timeval netTimeout;
+	netTimeout.tv_sec = 5;
+	netTimeout.tv_usec = 0;
+
+	ret = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<void*>(&netTimeout), sizeof netTimeout);
+	if (ret)
+	{
+		ROS_ERROR("Cannot set receive timeout, the receiving procedure may be blocked");
+	}
 }
 
 void IPT_Streamer::SetBlock()
@@ -152,9 +162,12 @@ void IPT_Streamer::Loop()
 				buf.push_back(0xAA);
 				int ret = send(client, buf.data(), buf.size(), 0);
 
-				if (ret < 0)
+				if (ret <= 0)
 				{
-					ROS_ERROR("Cannot send data, %s", strerror(errno));
+					if (ret == 0)
+						ROS_WARN("Socket peer shutdown during transmission");
+					else
+						ROS_ERROR("Cannot send data, %s", strerror(errno));
 					bSocket = false;
 					break;
 				}
@@ -166,15 +179,19 @@ void IPT_Streamer::Loop()
 
 			// Wait for a response to continue
 			int ret = recv(client, buf, sizeof buf, 0);
-			if (ret < 0)
+
+			if (ret <= 0)
 			{
-				ROS_ERROR("Cannot retrieve response : %s", strerror(errno));
+				if (ret == 0)
+					ROS_INFO("Stream socket peer has performed an orderly shutdown");
+				else
+					ROS_ERROR("Cannot retrieve response : %s", strerror(errno));
 				bSocket = false;
 			}
 
 			this->WaitAndSpin();
 		}
-		ROS_WARN("Rolling back to accept new connections");
+		ROS_INFO("Rolling back to accept new connections");
 	}
 }
 
