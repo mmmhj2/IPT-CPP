@@ -1,4 +1,5 @@
 <launch>
 	<node pkg="ipt_cpp" type="ipt_streamer_node" name="ipt_streamer_node" output="screen">
+		<param name="DeviceFile" type="string" value="$(find ipt_cpp)/videos/0530_color_120fps_L=4_9x9_noLight_720p.avi"/>
 	</node>
 </launch>
