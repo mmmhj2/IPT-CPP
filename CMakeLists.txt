@@ -93,6 +93,15 @@ target_link_libraries(ipt_node
 	${catkin_LIBRARIES}
 )
 
+add_executable(ipt_streamer_node
+	"main/main_streamer.cpp"
+	"ros/src/ipt_ros_streamer.cpp"
+)
+target_link_libraries(ipt_streamer_node
+	${OpenCV_LIBS}
+	${catkin_LIBRARIES}
+)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	
 	MESSAGE(NOTICE "Generating unit tests")

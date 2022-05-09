@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="ipt_cpp" type="ipt_streamer_node" name="ipt_streamer_node" output="screen">
+	</node>
+</launch>
