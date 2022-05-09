@@ -7,7 +7,9 @@
 int main(int argc, char * argv[])
 {
 
-	ipt::IPT_ROSInterface* pInterface = ipt::IPT_ROSInterface::GetInstance(argc, argv);
+	ros::init(argc, argv, "ipt_node");
+
+	ipt::IPT_ROSInterface* pInterface = ipt::IPT_ROSInterface::GetInstance();
 
 	char * dirPtr = get_current_dir_name();
 	ROS_INFO_STREAM("Current working directory : " << dirPtr);

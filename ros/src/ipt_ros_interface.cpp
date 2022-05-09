@@ -6,9 +6,9 @@ using namespace ipt;
 
 IPT_ROSInterface* IPT_ROSInterface::instance = nullptr;
 
-IPT_ROSInterface::IPT_ROSInterface(int argc, char* argv[], const std::string& nname)
+IPT_ROSInterface::IPT_ROSInterface(/*int argc, char* argv[], const std::string& nname*/)
 {
-	ros::init(argc, argv, nname);
+	//ros::init(argc, argv, nname);
 
 	// NodeHandle must be constructed after ros::init
 	// and therefore it's not desirable to use delegating constructors
@@ -68,10 +68,10 @@ IPT_ROSInterface::~IPT_ROSInterface()
 }
 
 IPT_ROSInterface*
-IPT_ROSInterface::GetInstance(int argc, char* argv[], const std::string & nname)
+IPT_ROSInterface::GetInstance(/*int argc, char* argv[], const std::string& nname*/)
 {
 	if (IPT_ROSInterface::instance == nullptr)
-		IPT_ROSInterface::instance = new IPT_ROSInterface(argc, argv, nname);
+		IPT_ROSInterface::instance = new IPT_ROSInterface(/*argc, argv, nname */ );
 	return IPT_ROSInterface::instance;
 }
 

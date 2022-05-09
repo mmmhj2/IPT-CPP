@@ -41,7 +41,7 @@ namespace ipt
 		void ConstructNodes();
 
 	protected:
-		IPT_ROSInterface(int argc, char* argv[], const std::string& node_name);
+		IPT_ROSInterface(/*int argc, char* argv[], const std::string& node_name*/);
 
 		static IPT_ROSInterface* instance;
 	public:
@@ -52,7 +52,7 @@ namespace ipt
 		// Delete copy constructor
 		IPT_ROSInterface(const IPT_ROSInterface&) = delete;
 
-		static IPT_ROSInterface* GetInstance(int argc = 0, char * argv[] = nullptr, const std::string & node_name = "ipt_node");
+		static IPT_ROSInterface* GetInstance(/*int argc = 0, char* argv[] = nullptr, const std::string& node_name = "ipt_node"*/);
 
 		// Modify the header of the pose and then publish it
 		void PublishPose(geometry_msgs::PoseStamped& pose);
