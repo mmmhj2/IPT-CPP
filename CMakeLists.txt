@@ -131,4 +131,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_link_libraries(rotation_convertion_test
 		${OpenCV_LIBS}
 	)
+
+	add_executable(streaming_tcp_test
+		tests/streaming_tcp_test.cpp
+	)
+	target_link_libraries(streaming_tcp_test
+		${OpenCV_LIBS}
+	)
 endif()

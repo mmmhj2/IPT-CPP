@@ -32,6 +32,10 @@ namespace ipt
 		void ReadParameters();
 		void InitSocket();
 
+		bool isBlocking;
+		void SetNonblock();
+		void SetBlock();
+
 	public:
 
 		IPT_Streamer();

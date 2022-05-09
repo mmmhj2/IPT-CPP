@@ -10,6 +10,7 @@ IPT_Streamer::IPT_Streamer()
 	this->pnh.reset(new ros::NodeHandle("~"));
 	this->rate.reset(new ros::Rate(120));
 
+	sock = 0;
 	frameStamp = 0;
 	client = -1;
 
@@ -18,11 +19,15 @@ IPT_Streamer::IPT_Streamer()
 
 	compressionArgs.push_back(cv::IMWRITE_PNG_COMPRESSION);
 	compressionArgs.push_back(1);
+
+	isBlocking = true;
 }
 
 IPT_Streamer::~IPT_Streamer()
 {
 	// Let unique_ptrs destroy themselves
+	if (sock > 0)
+		close(sock);
 }
 
 ros::NodeHandle* ipt::IPT_Streamer::GetPrivateNH()
@@ -72,29 +77,53 @@ void IPT_Streamer::InitSocket()
 		ROS_FATAL("Failed to listen on socket, %s", strerror(errno));
 		ros::shutdown();
 	}
-	
+}
+
+void IPT_Streamer::SetBlock()
+{
 	int flags = fcntl(sock, F_GETFL, 0);
 	if (flags == -1)
 	{
 		ROS_FATAL("Failed to get file control flags, %s", strerror(errno));
 		ros::shutdown();
 	}
-	ret = fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+	int ret = fcntl(sock, F_SETFL, flags & (~O_NONBLOCK));
+	if (ret == -1)
+	{
+		ROS_FATAL("Failed to switch to blocking mode, %s", strerror(errno));
+		ros::shutdown();
+	}
+	isBlocking = true;
+}
+
+void IPT_Streamer::SetNonblock()
+{
+	int flags = fcntl(sock, F_GETFL, 0);
+	if (flags == -1)
+	{
+		ROS_FATAL("Failed to get file control flags, %s", strerror(errno));
+		ros::shutdown();
+	}
+	int ret = fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 	if (ret == -1)
 	{
 		ROS_FATAL("Failed to switch to non-blocking mode, %s", strerror(errno));
 		ros::shutdown();
 	}
-	
+	isBlocking = false;
 }
 
 void IPT_Streamer::Loop()
 {
+	uchar buf[512];
 	cv::Mat frame[3];
 	sockaddr_in clientAddr;
 	socklen_t clientAddrLen;
 	while (ros::ok())
 	{
+		if (isBlocking)
+			this->SetNonblock();
+		clientAddrLen = sizeof clientAddr;
 		client = accept(sock, reinterpret_cast<sockaddr *>(&clientAddr), &clientAddrLen);
 		if (client < 0)
 		{
@@ -107,6 +136,7 @@ void IPT_Streamer::Loop()
 		ROS_INFO("Successfully established connection with tcp://%s:%d",
 			inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
 
+		this->SetBlock();
 		bool bSocket = true;
 		while (bSocket)
 		{
@@ -117,9 +147,10 @@ void IPT_Streamer::Loop()
 			{
 				std::vector <uchar> buf;
 				cv::imencode(".png", frame[i], buf, compressionArgs);
+				// Send a custom EOF marker
 				buf.push_back(0x55);
 				buf.push_back(0xAA);
-				int ret = send(sock, buf.data(), buf.size(), 0);
+				int ret = send(client, buf.data(), buf.size(), 0);
 
 				if (ret < 0)
 				{
@@ -130,10 +161,20 @@ void IPT_Streamer::Loop()
 
 			}
 
+			if (!bSocket)
+				continue;
+
+			// Wait for a response to continue
+			int ret = recv(client, buf, sizeof buf, 0);
+			if (ret < 0)
+			{
+				ROS_ERROR("Cannot retrieve response : %s", strerror(errno));
+				bSocket = false;
+			}
+
 			this->WaitAndSpin();
 		}
-
-		this->WaitAndSpin();
+		ROS_WARN("Rolling back to accept new connections");
 	}
 }
 
