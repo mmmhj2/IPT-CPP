@@ -1,5 +1,6 @@
 #include "ipt_ros_streamer.h"
 
+#include <cinttypes>
 #include <fcntl.h>
 
 using namespace ipt;
@@ -148,19 +149,56 @@ void IPT_Streamer::Loop()
 
 		this->SetBlock();
 		bool bSocket = true;
+
 		while (bSocket)
 		{
-
+			ros::Time frameTime = ros::Time::now();
 			this->videoCapture >> frame[0] >> frame[1] >> frame[2];
 
+			if (frame[0].empty() || frame[1].empty() || frame[2].empty())
+			{
+				ROS_FATAL("Video stream ended, exiting");
+				close(client);
+				ros::shutdown();
+			}
+
+			// Send the timestamp
+			int32_t timeCounter = frameTime.toSec();
+			int ret = send(client, &timeCounter, sizeof timeCounter, 0);
+			if (ret <= 0)
+			{
+				if (ret == 0)
+					ROS_WARN("Socket peer shutdown during transmission");
+				else
+					ROS_ERROR("Cannot send data, %s", strerror(errno));
+				bSocket = false;
+			}
+
+			if (!bSocket)
+				continue;
+
+			// Send serialized image data, three frames
 			for (int i = 0; i < 3; i++)
 			{
 				std::vector <uchar> buf;
 				cv::imencode(".png", frame[i], buf, compressionArgs);
-				// Send a custom EOF marker
-				buf.push_back(0x55);
-				buf.push_back(0xAA);
-				int ret = send(client, buf.data(), buf.size(), 0);
+
+				auto size = buf.size();
+				ROS_INFO_STREAM("Image " << i << " size " << size);
+				int ret = send(client, &size, sizeof size, 0);
+				if (ret > 0)
+				{
+					// End of stream marker
+					if(i == 2)
+					{
+						buf.push_back('E');
+						buf.push_back('o');
+						buf.push_back('S');
+					}
+					
+					ret = send(client, buf.data(), buf.size(), 0);
+				}
+					
 
 				if (ret <= 0)
 				{
@@ -178,8 +216,7 @@ void IPT_Streamer::Loop()
 				continue;
 
 			// Wait for a response to continue
-			int ret = recv(client, buf, sizeof buf, 0);
-
+			ret = recv(client, buf, sizeof buf, 0);
 			if (ret <= 0)
 			{
 				if (ret == 0)
@@ -192,6 +229,7 @@ void IPT_Streamer::Loop()
 			this->WaitAndSpin();
 		}
 		ROS_INFO("Rolling back to accept new connections");
+		close(client);
 	}
 }
 
