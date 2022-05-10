@@ -93,6 +93,7 @@ int main(int argc, char** argv)
 			//cout << "Image " << i << " : " << data[i].size() << " bytes" << endl;
 			frame[i-1] = cv::imdecode(data[i], cv::IMREAD_COLOR);
 
+			//cout << frame[i - 1].cols << "x" << frame[i - 1].rows << endl;
 			cv::imshow("Image", frame[i-1]);
 			cv::waitKey(1);
 		}

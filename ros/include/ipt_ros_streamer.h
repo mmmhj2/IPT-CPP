@@ -1,9 +1,9 @@
 #ifndef IPT_ROS_STREAMER_H
 #define IPT_ROS_STREAMER_H
 
+#include "ipt_ros_base.h"
+
 #include <opencv4/opencv2/opencv.hpp>
-#include <ros/ros.h>
-#include <memory>
 #include <string>
 
 #include <sys/socket.h>
@@ -11,12 +11,12 @@
 
 namespace ipt
 {
-	class IPT_Streamer
+	class IPT_Streamer : public IPT_ROSBase
 	{
 	protected:
 
-		std::unique_ptr <ros::NodeHandle> nh, pnh;
-		std::unique_ptr <ros::Rate> rate;
+		//std::unique_ptr <ros::NodeHandle> nh, pnh;
+		//std::unique_ptr <ros::Rate> rate;
 
 		uchar frameStamp;
 		uint32_t tcpLocalPort, tcpRemotePort;
@@ -45,10 +45,10 @@ namespace ipt
 		IPT_Streamer(const IPT_Streamer&) = delete;
 		IPT_Streamer& operator = (const IPT_Streamer&) = delete;
 
-		ros::NodeHandle* GetPrivateNH();
+		//ros::NodeHandle* GetPrivateNH();
 
 		void Loop();
-		void WaitAndSpin();
+		//void WaitAndSpin();
 
 		void SetVideoCapture(cv::VideoCapture vCapture);
 		

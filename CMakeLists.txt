@@ -97,10 +97,18 @@ target_link_libraries(ipt_node
 
 add_executable(ipt_streamer_node
 	"main/main_streamer.cpp"
-	"ros/src/ipt_ros_streamer.cpp"
+	${DIR_ROS_SRC}
 )
 target_link_libraries(ipt_streamer_node
 	${OpenCV_LIBS}
+	${catkin_LIBRARIES}
+)
+
+add_executable(ipt_pose_receiver_node
+	"main/main_receiver.cpp"
+	"ros/src/ipt_ros_pose_receiver.cpp"
+)
+target_link_libraries(ipt_pose_receiver_node
 	${catkin_LIBRARIES}
 )
 

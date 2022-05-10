@@ -7,9 +7,11 @@ using namespace ipt;
 
 IPT_Streamer::IPT_Streamer()
 {
+	/*
 	this->nh.reset(new ros::NodeHandle());
 	this->pnh.reset(new ros::NodeHandle("~"));
 	this->rate.reset(new ros::Rate(120));
+	*/
 
 	sock = 0;
 	frameStamp = 0;
@@ -30,11 +32,12 @@ IPT_Streamer::~IPT_Streamer()
 	if (sock > 0)
 		close(sock);
 }
-
+/*
 ros::NodeHandle* ipt::IPT_Streamer::GetPrivateNH()
 {
 	return this->pnh.get();
 }
+*/
 
 void IPT_Streamer::ReadParameters()
 {
@@ -181,7 +184,8 @@ void IPT_Streamer::Loop()
 			for (int i = 0; i < 3; i++)
 			{
 				std::vector <uchar> buf;
-				cv::imencode(".png", frame[i], buf, compressionArgs);
+				//cv::imencode(".png", frame[i], buf, compressionArgs);
+				cv::imencode(".bmp", frame[i], buf);
 
 				auto size = buf.size();
 				ROS_INFO_STREAM("Image " << i << " size " << size);
@@ -232,12 +236,13 @@ void IPT_Streamer::Loop()
 		close(client);
 	}
 }
-
+/*
 void IPT_Streamer::WaitAndSpin()
 {
 	this->rate->sleep();
 	ros::spinOnce();
 }
+*/
 
 void ipt::IPT_Streamer::SetVideoCapture(cv::VideoCapture vCapture)
 {

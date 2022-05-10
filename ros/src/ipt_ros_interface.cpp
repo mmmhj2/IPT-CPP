@@ -8,20 +8,12 @@ IPT_ROSInterface* IPT_ROSInterface::instance = nullptr;
 
 IPT_ROSInterface::IPT_ROSInterface(/*int argc, char* argv[], const std::string& nname*/)
 {
-	//ros::init(argc, argv, nname);
-
-	// NodeHandle must be constructed after ros::init
-	// and therefore it's not desirable to use delegating constructors
-	nh.reset(new ros::NodeHandle());
-	pnh.reset(new ros::NodeHandle("~"));
 
 	poseSeq = 0;
 	//poseFrameName = "map";
 
 	this->ReadParameters();
 	this->ConstructNodes();
-
-	pRate.reset(new ros::Rate(frequency));
 }
 
 void IPT_ROSInterface::ReadParameters()
@@ -108,7 +100,7 @@ void IPT_ROSInterface::GetFilteredPose(geometry_msgs::PoseStamped& pose) const
 {
 	pose = this->CurrentPose;
 }
-
+/*
 void IPT_ROSInterface::WaitAndSpin()
 {
 	pRate->sleep();
@@ -119,3 +111,4 @@ ros::NodeHandle* ipt::IPT_ROSInterface::GetPrivateNH()
 {
 	return pnh.get();
 }
+*/

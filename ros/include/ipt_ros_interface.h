@@ -2,8 +2,9 @@
 #ifndef IPT_ROS_INTERFACE_INCLUDED
 #define IPT_ROS_INTERFACE_INCLUDED
 
+#include "ipt_ros_base.h"
+
 #include <string>
-#include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/Imu.h>
 
@@ -12,7 +13,7 @@ namespace ipt
 	/*
 	* IPT_ROSInterface : A naive singleton used for ROS operations
 	*/
-	class IPT_ROSInterface
+	class IPT_ROSInterface : public IPT_ROSBase
 	{
 	private:
 		std::string orientationSubscriberNodeName;
@@ -31,8 +32,8 @@ namespace ipt
 		ros::Subscriber orientationSubscriber, quatSubscriber;
 
 		// ros::Rate has no default constructor, so we use a pointer
-		std::unique_ptr<ros::Rate> pRate;
-		std::unique_ptr<ros::NodeHandle> nh, pnh;
+		//std::unique_ptr<ros::Rate> pRate;
+		//std::unique_ptr<ros::NodeHandle> nh, pnh;
 
 		void OrientationCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
 		void ImuCallback(const sensor_msgs::Imu::ConstPtr& msg);
@@ -66,9 +67,8 @@ namespace ipt
 		// Aquire filtered pose from MAVROS
 		void GetFilteredPose(geometry_msgs::PoseStamped& pose) const;
 		
-		void WaitAndSpin();
-
-		ros::NodeHandle* GetPrivateNH();
+		//void WaitAndSpin();
+		//ros::NodeHandle* GetPrivateNH();
 	};
 }
 
