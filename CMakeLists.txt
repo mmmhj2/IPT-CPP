@@ -145,8 +145,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 	add_executable(streaming_tcp_test
 		tests/streaming_tcp_test.cpp
+		${DIR_SRC}
 	)
 	target_link_libraries(streaming_tcp_test
+		${apriltag_LIBRARIES} 
 		${OpenCV_LIBS}
+		${CMAKE_THREAD_LIBS_INIT}
 	)
 endif()

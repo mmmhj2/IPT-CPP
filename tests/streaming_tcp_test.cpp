@@ -1,3 +1,5 @@
+#include "ipt_receiver_new.h"
+
 #include <opencv4/opencv2/opencv.hpp>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -5,7 +7,14 @@
 #include <poll.h>
 
 constexpr char HOST[] = "127.0.0.1";
-constexpr short PORT = 19810;
+constexpr short TCPPORT = 19810;
+constexpr short UDPPORT = 19198;
+
+constexpr char CAM_PARA_PATH[] = "../../../params/cam_para_80d_1280x720.json";
+constexpr char MAP_PARA_PATH[] = "../../../params/map_info_9x9.json";
+constexpr double SCALE_F = 0.5;
+constexpr int WIDTH = 1280;
+constexpr int HEIGHT = 720;
 
 using std::cout;
 using std::endl;
@@ -15,14 +24,23 @@ uchar buffer[16 * 1024 * 1024];
 
 int main(int argc, char** argv)
 {
+	ipt::IPT_Receiver refactored(CAM_PARA_PATH, MAP_PARA_PATH, WIDTH, HEIGHT, SCALE_F);
+
 	char ACK[] = "ACK";
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
+	int sockUDP = socket(AF_INET, SOCK_DGRAM, 0);
+
+	sockaddr_in udpServerAddr;
+	memset(&udpServerAddr, 0x00, sizeof udpServerAddr);
+	udpServerAddr.sin_family = AF_INET;
+	udpServerAddr.sin_addr.s_addr = inet_addr(HOST);
+	udpServerAddr.sin_port = htons(UDPPORT);
 
 	sockaddr_in serverAddr;
 	memset(&serverAddr, 0x00, sizeof serverAddr);
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = inet_addr(HOST);
-	serverAddr.sin_port = htons(PORT);
+	serverAddr.sin_port = htons(TCPPORT);
 
 	int ret = connect(sock, reinterpret_cast<sockaddr*>(&serverAddr), sizeof serverAddr);
 	if (ret < 0)
@@ -94,11 +112,21 @@ int main(int argc, char** argv)
 			frame[i-1] = cv::imdecode(data[i], cv::IMREAD_COLOR);
 
 			//cout << frame[i - 1].cols << "x" << frame[i - 1].rows << endl;
-			cv::imshow("Image", frame[i-1]);
-			cv::waitKey(1);
+			//cv::imshow("Image", frame[i-1]);
+			//cv::waitKey(1);
+		}
+		
+		zarray_t * detections;
+		cv::Vec3d position, angle;
+		refactored.Demodulate(frame[0], frame[1], frame[2], detections);
+		refactored.EstimatePose(detections, position, angle);
+
+		if (refactored.tag_exist_flag)
+		{
+			cout << "Estimation successful" << endl;
+			int ret = sendto(sockUDP, ACK, sizeof ACK, 0, reinterpret_cast<sockaddr*>(&udpServerAddr), sizeof udpServerAddr);
 		}
 			
-		
 
 	}
 	close(sock);

@@ -188,7 +188,7 @@ void IPT_Streamer::Loop()
 				cv::imencode(".bmp", frame[i], buf);
 
 				auto size = buf.size();
-				ROS_INFO_STREAM("Image " << i << " size " << size);
+				ROS_DEBUG_STREAM("Image " << i << " size " << size);
 				int ret = send(client, &size, sizeof size, 0);
 				if (ret > 0)
 				{
