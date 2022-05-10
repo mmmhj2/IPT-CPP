@@ -11,6 +11,12 @@ typedef struct tagSocketPose
 	double qw, qx, qy, qz;
 }SocketPose;
 
+typedef union tagSocketPoseConverter
+{
+	SocketPose data;
+	char binary[sizeof data];
+}SocketPoseConverter;
+
 SocketPose GetDeserializedPose(const char* buf);
 
 #endif

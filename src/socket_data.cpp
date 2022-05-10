@@ -1,11 +1,5 @@
 #include "socket_data.h"
 
-typedef union tagSocketPoseConverter
-{
-	SocketPose data;
-	char binary[sizeof data];
-}SocketPoseConverter;
-
 SocketPose GetDeserializedPose(const char* buf)
 {
 	static_assert(sizeof(SocketPose) == sizeof(SocketPoseConverter), "Converter size assertion failed");

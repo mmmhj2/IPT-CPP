@@ -46,7 +46,7 @@ void IPT_Streamer::ReadParameters()
 	tcpLocalPort = tport;
 	pnh->param<int>("TCPRemotePort", tport, 19198);
 	tcpRemotePort = tport;
-	pnh->param<std::string>("TCPLocalIP", tcpLocalIp, "127.0.0.1");
+	pnh->param<std::string>("TCPLocalIP", tcpLocalIp, "0.0.0.0");
 	pnh->param<std::string>("TCPRemoteIP", tcpRemoteIp, "127.0.0.1");
 }
 
