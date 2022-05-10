@@ -1,6 +1,8 @@
 #ifndef IPT_ROS_STREAMER_H
 #define IPT_ROS_STREAMER_H
 
+#include "socket_data.h"
+
 #include <opencv4/opencv2/opencv.hpp>
 #include <ros/ros.h>
 #include <memory>
