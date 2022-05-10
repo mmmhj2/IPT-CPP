@@ -19,11 +19,9 @@ int ipt::IPT_Receiver_Parallel::Detection(const cv::Mat& img, zarray_t*& detecti
 {
 	apriltag_detector_t * pDetector = static_cast<apriltag_detector_t * >(malloc(sizeof(apriltag_detector_t)));
 	memcpy(pDetector, this->td, sizeof(apriltag_detector_t));
-	image_u8_t img_u8 = {
-		.width = img.cols,
-		.height = img.rows,
-		.stride = img.cols,
-		.buf = img.data };
+
+	image_u8_t img_u8 = { img.cols, img.rows, img.cols, img.data };
+
 	detections = apriltag_detector_detect(pDetector, &img_u8);
 	free(pDetector);
 

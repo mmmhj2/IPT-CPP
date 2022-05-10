@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.15)  # CMake version check
 project(ipt_cpp)  # Create project "simple_example"
 set(CMAKE_CXX_STANDARD 14)  # Enable c++14 standard
 
+add_compile_options(-Wall -Wextra -pedantic)
+
 # Specify build type
 if(NOT DEFINED CMAKE_BUILD_TYPE)
 	MESSAGE(WARNING "Build type unspecified, default to release")
