@@ -23,13 +23,13 @@ std::pair<int, int>
 ipt::IPT_Receiver::AlignImg(
 	const cv::Mat& img_lig_pre,
 	const cv::Mat& img_lig_now,
-	int nSample)
+	size_t nSample)
 {
-	using Samples = cv::Mat[nSample];
-	Samples horizontal_lines_pre, horizontal_lines_now;
-	Samples vertical_lines_pre, vertical_lines_now;
+	using Samples = std::vector<cv::Mat>;
+	Samples horizontal_lines_pre{ nSample }, horizontal_lines_now{ nSample };
+	Samples vertical_lines_pre{ nSample }, vertical_lines_now{ nSample };
 
-	for (int i = 0; i < nSample; i++)
+	for (size_t i = 0; i < nSample; i++)
 	{
 		horizontal_lines_now[i] = img_lig_now.row(height * (i + 1) / (nSample + 1) - 1);
 		horizontal_lines_pre[i] = img_lig_pre.row(height * (i + 1) / (nSample + 1) - 1);
@@ -42,7 +42,7 @@ ipt::IPT_Receiver::AlignImg(
 	for (int offset = -5; offset <= 5; ++offset)
 	{
 		double val_x{ 0 }, val_y{ 0 };
-		for (int i = 0; i < nSample; ++i)
+		for (size_t i = 0; i < nSample; ++i)
 		{
 			cv::Mat a_x = horizontal_lines_pre[i].colRange(
 				std::max(offset, 0), width + std::min(offset, 0));
@@ -71,7 +71,7 @@ std::pair<cv::Mat, cv::Mat> ipt::IPT_Receiver::GetRTVector(zarray_t*& detections
 	cv::Mat obj_pts = cv::Mat::zeros(4 * zarray_size(detections), 3, CV_64FC1);
 	cv::Mat img_pts = cv::Mat::zeros(4 * zarray_size(detections), 2, CV_64FC1);
 
-	for (size_t i = 0; i < zarray_size(detections); ++i)
+	for (int i = 0; i < zarray_size(detections); ++i)
 	{
 		const int index_num = 4 * i;
 		apriltag_detection_t* det;
@@ -137,11 +137,7 @@ cv::Mat ipt::IPT_Receiver::Substraction(cv::Mat& img_lightness_1, cv::Mat& img_l
 
 int ipt::IPT_Receiver::Detection(const cv::Mat& img, zarray_t *& detections)
 {
-	image_u8_t img_u8 = { 
-		.width = img.cols, 
-		.height = img.rows, 
-		.stride = img.cols, 
-		.buf = img.data };
+	image_u8_t img_u8 = { img.cols, img.rows, img.cols, img.data };
 	detections = apriltag_detector_detect(td, &img_u8);
 	return zarray_size(detections);
 }

@@ -41,7 +41,7 @@ namespace ipt
 			GetLightnessCh(const cv::Mat& img_bgr, cv::Mat& img_lightness);
 		// Align two img
 		std::pair<int, int> AlignImg(const cv::Mat& img_lig_pre,
-			const cv::Mat& img_lig_new, int nSample = 3);
+			const cv::Mat& img_lig_new, size_t nSample = 3);
 
 		std::pair <cv::Mat, cv::Mat> GetRTVector(zarray_t *& detections);
 		// Process the img_sub before detection
