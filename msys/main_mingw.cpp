@@ -88,6 +88,13 @@ void PrintHelp()
 	// Stub
 }
 
+char * GetErrorMsg(DWORD dwMessageId)
+{
+	static char errmsg[1024];
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwMessageId, 0, errmsg, sizeof errmsg, NULL);
+	return errmsg;
+}
+
 int main(int argc, char** argv)
 {
 	if (GetArgs(argc, argv))
@@ -130,7 +137,7 @@ int main(int argc, char** argv)
 	int ret = connect(sock, reinterpret_cast<sockaddr*>(&serverAddr), sizeof serverAddr);
 	if (ret < 0)
 	{
-		cout << "Cannot connect to server : " << errno << endl;
+		cout << "Cannot connect to server : " << GetErrorMsg(WSAGetLastError()) << endl;
 		return -1;
 	}
 
@@ -156,7 +163,7 @@ int main(int argc, char** argv)
 				if (bytesRead == 0)
 					cout << "Connection shutdown by peer" << endl;
 				else
-					cout << "Cannot read from TCP connection : " << errno << endl;
+					cout << "Cannot read from TCP connection : " << GetErrorMsg(WSAGetLastError()) << endl;
 				return 0;
 			}
 
