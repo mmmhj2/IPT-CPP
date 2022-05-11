@@ -1,4 +1,5 @@
 #include "ipt_ros_streamer.h"
+#include "socket_data.h"
 
 #include <cinttypes>
 #include <fcntl.h>
@@ -166,7 +167,8 @@ void IPT_Streamer::Loop()
 			}
 
 			// Send the timestamp
-			int32_t timeCounter = frameTime.toSec();
+			// Hopefully both hosts have the same endianness 
+			TimestampType timeCounter = frameTime.toSec();
 			int ret = send(client, &timeCounter, sizeof timeCounter, 0);
 			if (ret <= 0)
 			{
@@ -187,7 +189,7 @@ void IPT_Streamer::Loop()
 				//cv::imencode(".png", frame[i], buf, compressionArgs);
 				cv::imencode(".bmp", frame[i], buf);
 
-				auto size = buf.size();
+				ImageSzType size = buf.size();
 				ROS_DEBUG_STREAM("Image " << i << " size " << size);
 				int ret = send(client, &size, sizeof size, 0);
 				if (ret > 0)

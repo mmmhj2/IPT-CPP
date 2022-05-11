@@ -1,6 +1,5 @@
 #include "ipt_ros_pose_receiver.h"
 
-#include "socket_data.h"
 #include <fcntl.h>
 
 using namespace ipt;
@@ -9,11 +8,14 @@ IPT_PoseReceiver::IPT_PoseReceiver()
 {
 	pnh->param<std::string>("PoseTopicName", this->poseNodeName, "ipt/pose");
 	pnh->param<std::string>("UdpLocalIp", this->udpLocalIp, "0.0.0.0");
+	pnh->param<std::string>("FrameName", this->frameName, "map");
 	pnh->param<int>("UdpLocalPort", this->udpLocalPort, 19198);
 
 	this->sock = -1;
 
 	this->InitSocket();
+
+	this->posePub = nh->advertise<geometry_msgs::PoseStamped>(this->poseNodeName, 10);
 }
 
 IPT_PoseReceiver::~IPT_PoseReceiver()
@@ -61,11 +63,30 @@ void IPT_PoseReceiver::InitSocket()
 	}
 }
 
+geometry_msgs::PoseStamped ipt::IPT_PoseReceiver::MakePose(const SocketPose& pose)
+{
+	geometry_msgs::PoseStamped ps;
+	ps.header.frame_id = this->frameName;
+	ps.header.seq = ++seq;
+	ps.header.stamp = ros::Time(pose.stamp);
+	ps.pose.position.x = pose.x;
+	ps.pose.position.y = pose.y;
+	ps.pose.position.z = pose.z;
+	ps.pose.orientation.w = pose.qw;
+	ps.pose.orientation.x = pose.qx;
+	ps.pose.orientation.y = pose.qy;
+	ps.pose.orientation.z = pose.qz;
+	ROS_INFO_THROTTLE(1, "Pose %f sec, (%f, %f, %f), (%f, %f, %f, %f)", 
+		ps.header.stamp.toSec(), pose.x, pose.y, pose.z, pose.qw, pose.qx, pose.qy, pose.qz);
+	return ps;
+}
+
 void IPT_PoseReceiver::Loop()
 {
 	char buffer[512];
 	socklen_t addr_len;
 	sockaddr_in addr_in;
+	addr_len = sizeof addr_in;
 
 	while (ros::ok())
 	{
@@ -82,6 +103,16 @@ void IPT_PoseReceiver::Loop()
 		}
 
 		ROS_INFO_THROTTLE(1, "Received %d bytes from udp://%s:%d", ret, inet_ntoa(addr_in.sin_addr), ntohs(addr_in.sin_port));
+
+		if (ret == sizeof(SocketPose))
+		{
+			SocketPoseConverter sockPose;
+			memcpy(sockPose.binary, buffer, ret);
+
+			this->posePub.publish(this->MakePose(sockPose.data));
+		}
+		else
+			ROS_WARN("Discarding data : expecting %d bytes, got %d bytes", sizeof(SocketPose), ret);
 		
 		this->WaitAndSpin();
 	}

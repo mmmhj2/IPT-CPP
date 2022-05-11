@@ -4,11 +4,15 @@
 #include <cstring>
 #include <cstdint>
 
+typedef double PoseDataType;
+typedef double TimestampType;
+typedef size_t ImageSzType;
+
 typedef struct tagSocketPose
 {
-	int32_t stamp;
-	double x, y, z;
-	double qw, qx, qy, qz;
+	TimestampType stamp;
+	PoseDataType x, y, z;
+	PoseDataType qw, qx, qy, qz;
 }SocketPose;
 
 typedef union tagSocketPoseConverter

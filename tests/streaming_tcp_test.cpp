@@ -1,4 +1,5 @@
 #include "ipt_receiver_new.h"
+#include "socket_data.h"
 
 #include <opencv4/opencv2/opencv.hpp>
 #include <arpa/inet.h>
@@ -85,7 +86,7 @@ int main(int argc, char** argv)
 
 		// Get timestamp
 		uchar * ptr = buffer;
-		for (ptr = buffer; ptr - buffer < 4; ++ptr)
+		for (ptr = buffer; ptr - buffer < sizeof(TimestampType); ++ptr)
 			data[0].push_back(*ptr);
 
 		// Split the images
@@ -95,7 +96,7 @@ int main(int argc, char** argv)
 			//sizeBuf.insert(sizeBuf.end(), ptr, ptr + sizeof sizeBuf.size());
 			//ptr += sizeof sizeBuf.size();
 			uchar* nptr;
-			for (nptr = ptr; nptr - ptr < sizeof(size_t); ++nptr)
+			for (nptr = ptr; nptr - ptr < sizeof(ImageSzType); ++nptr)
 				sizeBuf.push_back(*nptr);
 			ptr = nptr;
 
@@ -124,7 +125,20 @@ int main(int argc, char** argv)
 		if (refactored.tag_exist_flag)
 		{
 			cout << "Estimation successful" << endl;
-			int ret = sendto(sockUDP, ACK, sizeof ACK, 0, reinterpret_cast<sockaddr*>(&udpServerAddr), sizeof udpServerAddr);
+			cout << "Position : " << position << endl;
+			//int ret = sendto(sockUDP, ACK, sizeof ACK, 0, reinterpret_cast<sockaddr*>(&udpServerAddr), sizeof udpServerAddr);
+			SocketPose sp;
+			sp.stamp = *reinterpret_cast<TimestampType*>(data[0].data());
+			sp.x = position[0];
+			sp.y = position[1];
+			sp.z = position[2];
+
+			cv::Vec4d quat = ipt::euler_2_quaternion(angle);
+			sp.qw = quat[0];
+			sp.qx = quat[1];
+			sp.qy = quat[2];
+			sp.qz = quat[3];
+			int ret = sendto(sockUDP, &sp, sizeof sp, 0, reinterpret_cast<sockaddr*>(&udpServerAddr), sizeof udpServerAddr);
 		}
 			
 
