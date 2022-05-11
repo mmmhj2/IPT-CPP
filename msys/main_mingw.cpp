@@ -5,13 +5,16 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include <iostream>
+#include <getopt.h>
 
-constexpr char HOST[] = "127.0.0.1";
+constexpr char OPTSTRING[] = "H:T:U:c:m:s:w:h:";
+
+constexpr char HOST[] = "10.1.1.200";
 constexpr short TCPPORT = 19810;
 constexpr short UDPPORT = 19198;
 
-constexpr char CAM_PARA_PATH[] = "../../../params/cam_para_80d_1280x720.json";
-constexpr char MAP_PARA_PATH[] = "../../../params/map_info_9x9.json";
+constexpr char DEF_CAM_PARA_PATH[] = "../../params/cam_para_80d_1280x720.json";
+constexpr char DEF_MAP_PARA_PATH[] = "../../params/map_info_9x9.json";
 constexpr double SCALE_F = 0.5;
 constexpr int WIDTH = 1280;
 constexpr int HEIGHT = 720;
@@ -21,10 +24,85 @@ using std::endl;
 
 // A huge 16MiB buffer enough for three images
 uchar buffer[16 * 1024 * 1024];
+char host[64];
+short tcpport{ TCPPORT }, udpport{ UDPPORT };
+char cam_para_path[512];
+char map_para_path[512];
+double scale_f{ SCALE_F };
+int width{ WIDTH }, height{HEIGHT};
+
+int GetArgs(int argc, char* argv[])
+{
+	int result, ret = 0;
+	// "H::T::U::c::m::s::w::h::"
+	while((result = getopt(argc, argv, OPTSTRING)) != -1)
+	{
+		switch (result)
+		{
+		case 'H':
+			strcpy(host, optarg);
+			break;
+		case 'T':
+			tcpport = atoi(optarg);
+			break;
+		case 'U':
+			udpport = atoi(optarg);
+			break;
+		case 'c':
+			strcpy(cam_para_path, optarg);
+			break;
+		case 'm':
+			strcpy(map_para_path, optarg);
+			break;
+		case 's':
+			sscanf(optarg, "%lf", &scale_f);
+			break;
+		case 'w':
+			width = atoi(optarg);
+			break;
+		case 'h':
+			height = atoi(optarg);
+			break;
+		case '?':
+			cout << "Unrecognized option" << endl;
+			ret = -1;
+			break;
+		}
+		if (ret == -1)
+			break;
+	}
+
+	// Set default value
+	if (strlen(host) == 0)
+		strcpy(host, HOST);
+	if (strlen(cam_para_path) == 0)
+		strcpy(cam_para_path, DEF_CAM_PARA_PATH);
+	if (strlen(map_para_path) == 0)
+		strcpy(map_para_path, DEF_MAP_PARA_PATH);
+	// TODO : Check if valid
+	return ret;
+}
+
+void PrintHelp()
+{
+	// Stub
+}
 
 int main(int argc, char** argv)
 {
-	ipt::IPT_Receiver refactored(CAM_PARA_PATH, MAP_PARA_PATH, WIDTH, HEIGHT, SCALE_F);
+	if (GetArgs(argc, argv))
+	{
+		PrintHelp();
+		return -1;
+	}
+		
+	cout << "Host : " << host << endl;
+	cout << "Camera file : " << cam_para_path << endl;
+	cout << "Map file : " << map_para_path << endl;
+	cout << "Width : " << width << endl;
+	cout << "Height : " << height << endl;
+	cout << "Scale factor : " << scale_f << endl;
+	ipt::IPT_Receiver refactored(cam_para_path, map_para_path, width, height, scale_f);
 
 	WSAData wsaData;
 	if (WSAStartup(MAKEWORD(1, 1), &wsaData) == SOCKET_ERROR)
@@ -40,14 +118,14 @@ int main(int argc, char** argv)
 	sockaddr_in udpServerAddr;
 	memset(&udpServerAddr, 0x00, sizeof udpServerAddr);
 	udpServerAddr.sin_family = AF_INET;
-	udpServerAddr.sin_addr.s_addr = inet_addr(HOST);
-	udpServerAddr.sin_port = htons(UDPPORT);
+	udpServerAddr.sin_addr.s_addr = inet_addr(host);
+	udpServerAddr.sin_port = htons(udpport);
 
 	sockaddr_in serverAddr;
 	memset(&serverAddr, 0x00, sizeof serverAddr);
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = inet_addr(HOST);
-	serverAddr.sin_port = htons(TCPPORT);
+	serverAddr.sin_addr.s_addr = inet_addr(host);
+	serverAddr.sin_port = htons(tcpport);
 
 	int ret = connect(sock, reinterpret_cast<sockaddr*>(&serverAddr), sizeof serverAddr);
 	if (ret < 0)
