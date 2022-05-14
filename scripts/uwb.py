@@ -13,11 +13,11 @@ from geometry_msgs.msg import PoseWithCovarianceStamped
 def uint16(LO, HI):
     return (LO & 0xFF) | (HI & 0xFF) << 8
 
-def uint24(val0, val1, val2):
+def uint24(LO, MI, HI):
     if (val2 & 0xff) != 0:
-        return ((val0 << 8 | val1 << 16 | val2 << 24) >> 8) - 0x1000000
+        return ((LO << 8 | MI << 16 | HI << 24) >> 8) - 0x1000000
     else:
-        return (val0 << 8 | val1 << 16 | val2 << 24) >> 8
+        return (LO << 8 | MI << 16 | HI << 24) >> 8
 
 def recv(serial):
     while True:

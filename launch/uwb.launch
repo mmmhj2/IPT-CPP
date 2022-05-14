@@ -1,4 +1,4 @@
 <launch>
-	<node pkg="ipt_cpp" type="uwb.py" name="uwb">
+	<node pkg="ipt_cpp" type="uwb_tag.py" name="uwb" output="screen">
 	</node>
 </launch>
