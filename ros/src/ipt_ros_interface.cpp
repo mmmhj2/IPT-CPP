@@ -1,6 +1,7 @@
 #include "ipt_ros_interface.h"
 
 #include <functional>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 using namespace ipt;
 
@@ -42,6 +43,8 @@ void IPT_ROSInterface::ConstructNodes()
 		= nh->advertise<geometry_msgs::PoseStamped>(this->posePublisherNodeName + "_raw", 10);
 	this->uncalibratedPosePublisher
 		= nh->advertise<geometry_msgs::PoseStamped>(this->posePublisherNodeName + "_uncalib", 10);
+	this->covPosePublisher
+		= nh->advertise<geometry_msgs::PoseWithCovarianceStamped>(this->posePublisherNodeName + "_cov", 10);
 }
 
 void IPT_ROSInterface::OrientationCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
@@ -72,6 +75,15 @@ void IPT_ROSInterface::PublishPose(geometry_msgs::PoseStamped& pose)
 	pose.header.seq = ++(this->poseSeq);
 	pose.header.frame_id = this->poseFrameName;
 	this->posePublisher.publish(pose);
+
+	geometry_msgs::PoseWithCovarianceStamped pose_cov;
+	pose_cov.header = pose.header;
+	pose_cov.pose.pose = pose.pose;
+	//pose_cov.pose.covariance = IPT_ROSInterface::CovarianceArray.data();
+	for (size_t i = 0; i < 36; i++)
+		pose_cov.pose.covariance[i] = IPT_ROSInterface::CovarianceArray[i];
+
+	this->covPosePublisher.publish(pose_cov);
 }
 
 void IPT_ROSInterface::PublishPose(geometry_msgs::PoseStamped& pose, geometry_msgs::PoseStamped& poseRaw, geometry_msgs::PoseStamped & poseUncalib)
@@ -83,6 +95,15 @@ void IPT_ROSInterface::PublishPose(geometry_msgs::PoseStamped& pose, geometry_ms
 	poseUncalib.header.frame_id = this->poseFrameName;
 	this->rawPosePublisher.publish(poseRaw);
 	this->uncalibratedPosePublisher.publish(poseUncalib);
+
+	geometry_msgs::PoseWithCovarianceStamped pose_cov;
+	pose_cov.header = pose.header;
+	pose_cov.pose.pose = pose.pose;
+	//pose_cov.pose.covariance = IPT_ROSInterface::CovarianceArray.data();
+	for (size_t i = 0; i < 36; i++)
+		pose_cov.pose.covariance[i] = IPT_ROSInterface::CovarianceArray[i];
+
+	this->covPosePublisher.publish(pose_cov);
 }
 
 void IPT_ROSInterface::GetEstimatedPose(geometry_msgs::Quaternion& quat) const

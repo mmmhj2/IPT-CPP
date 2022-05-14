@@ -16,6 +16,15 @@ namespace ipt
 	class IPT_ROSInterface : public IPT_ROSBase
 	{
 	private:
+
+		constexpr static std::array<double, 36> CovarianceArray = 
+			{1, 0, 0, 0, 0, 0, 
+			0, 1, 0, 0, 0, 0,
+			0, 0, 1, 0, 0, 0,
+			0, 0, 0, 1, 0, 0,
+			0, 0, 0, 0, 1, 0,
+			0, 0, 0, 0, 0, 1};
+
 		std::string orientationSubscriberNodeName;
 		std::string imuSubscriberNodeName;
 		std::string posePublisherNodeName;
@@ -28,7 +37,7 @@ namespace ipt
 		std_msgs::Header ImuHeader;
 		geometry_msgs::Quaternion ImuQuat;
 
-		ros::Publisher posePublisher, rawPosePublisher, uncalibratedPosePublisher;
+		ros::Publisher posePublisher, rawPosePublisher, uncalibratedPosePublisher, covPosePublisher;
 		ros::Subscriber orientationSubscriber, quatSubscriber;
 
 		// ros::Rate has no default constructor, so we use a pointer
