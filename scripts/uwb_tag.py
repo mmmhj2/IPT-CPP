@@ -15,9 +15,9 @@ import sys
 from geometry_msgs.msg import PoseWithCovarianceStamped
 
 COVARIANCEARRAY = [
-0.004, 0, 0, 0, 0, 0,
-0, 0.004, 0, 0, 0, 0,
-0, 0, 0.004, 0, 0, 0,
+0.006, 0, 0, 0, 0, 0,
+0, 0.006, 0, 0, 0, 0,
+0, 0, 0.006, 0, 0, 0,
 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0,
@@ -26,23 +26,24 @@ COVARIANCEARRAY = [
 def uint16(LO, HI):
     return (LO & 0xFF) | (HI & 0xFF) << 8
 
-def uint24(LO, MI, HI):
-    if (val2 & 0xff) != 0:
-        return ((LO << 8 | MI << 16 | HI << 24) >> 8) - 0x1000000
+def int24(LO, MI, HI):
+    if (HI & 0xC0) != 0:
+        return ((LO << 8 | MI << 16 | HI << 24) >> 8) - (1 << 24)
     else:
         return (LO << 8 | MI << 16 | HI << 24) >> 8
 
-def int24(LO, MI, HI):
+def uint24(LO, MI, HI):
     return (LO << 8 | MI << 16 | HI << 24) >> 8
 
 def recv(serial):
     while True:
         data = serial.read_all()
-        if data == '':
+        if len(data) <= 0:
+            time.sleep(0.01)
             continue
         else:
             break
-        time.sleep(0.01)
+        
     return data
 
 def verifySum(recv_bytes, length):
@@ -88,19 +89,23 @@ if __name__ == "__main__":
                     continue
                 frame = data[i:i+128]
                 if not verifySum(frame, 128):
-                    rp.logerror("Got corrupted message")
+                    rp.logerr("Got corrupted message")
                     continue
                 # Little-Endian
-                x = int24(data[4], data[5], data[6]) / 1000
-                y = int24(data[7], data[8], data[9]) / 1000
-                z = int24(data[10], data[11], data[12]) / 1000
+                x = int24(frame[4], frame[5], frame[6]) / 1000
+                y = int24(frame[7], frame[8], frame[9]) / 1000
+                z = int24(frame[10], frame[11], frame[12]) / 1000
                 pose = PoseWithCovarianceStamped()
                 pose.header.seq = seq
                 seq += 1
                 pose.header.frame_id = UWBFrame
                 pose.header.stamp = rp.get_rostime()
-                pose.pose.pose.x = x
-                pose.pose.pose.y = y
-                pose.pose.pose.z = z
+                pose.pose.pose.position.x = x
+                pose.pose.pose.position.y = y
+                pose.pose.pose.position.z = z
+                pose.pose.pose.orientation.w = 1
+                pose.pose.pose.orientation.x = 0
+                pose.pose.pose.orientation.y = 0
+                pose.pose.pose.orientation.z = 0
                 pose.pose.covariance = covariance
                 pub.publish(pose)
