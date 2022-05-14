@@ -6,6 +6,7 @@
 using namespace ipt;
 
 IPT_ROSInterface* IPT_ROSInterface::instance = nullptr;
+constexpr std::array<double, 36> IPT_ROSInterface::CovarianceArray;
 
 IPT_ROSInterface::IPT_ROSInterface(/*int argc, char* argv[], const std::string& nname*/)
 {

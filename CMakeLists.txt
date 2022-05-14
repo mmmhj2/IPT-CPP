@@ -33,7 +33,7 @@ find_package(Threads)
 
 # Configuration for catkin
 find_package(catkin REQUIRED COMPONENTS
-	roscpp roslib
+	roscpp roslib rospy
 )
 catkin_package(
 )
