@@ -210,8 +210,10 @@ int main(int argc, char** argv)
 		
 		zarray_t * detections;
 		cv::Vec3d position, angle;
+		cv::Mat rotMat;
 		refactored.Demodulate(frame[0], frame[1], frame[2], detections);
-		refactored.EstimatePose(detections, position, angle);
+		refactored.EstimatePose(detections, position, rotMat);
+		angle = ipt::rotation_2_euler(rotMat);
 
 		if (refactored.tag_exist_flag)
 		{

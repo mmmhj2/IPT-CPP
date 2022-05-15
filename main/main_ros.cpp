@@ -140,13 +140,14 @@ int main(int argc, char * argv[])
 
 		if (!bUseMavrosPose)
 		{
-			receiver.EstimatePose(detections, position, angle);
+			cv::Mat rotMat;
+			receiver.EstimatePose(detections, position, rotMat);
 
 			posePub.header.stamp = frameTime;
 			posePub.pose.position.x = position[0];
 			posePub.pose.position.y = position[1];
 			posePub.pose.position.z = position[2];
-			quat = ipt::euler_2_quaternion(angle);
+			quat = ipt::rotation_2_quaternion(rotMat);
 			posePub.pose.orientation.w = quat[0];
 			posePub.pose.orientation.x = quat[1];
 			posePub.pose.orientation.y = quat[2];
@@ -187,7 +188,7 @@ int main(int argc, char * argv[])
 			rotationMat = alignMat * rotationMat;
 			//cv::transpose(R_b_c * rotationMat, rotationMat);
 			rotationMat = rotationMat * R_b_c;
-			receiver.EstimatePoseWithOrientation(detections, position, angle, rotationMat, posr, angler, posUncal);
+			receiver.EstimatePoseWithOrientation(detections, position, rotationMat, posr, angler, posUncal);
 
 			auto newQuat = ipt::rotation_2_quaternion(rotationMat);
 			ros_quat.w = newQuat[0];

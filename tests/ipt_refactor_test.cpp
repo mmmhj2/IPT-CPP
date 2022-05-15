@@ -97,8 +97,10 @@ int main(int argc, char* argv[])
 			break;
 		}
 
+		cv::Mat rotMat;
 		refactored.Demodulate(f_pre, f_now, f_nxt, detections);
-		refactored.EstimatePose(detections, position, angle);
+		refactored.EstimatePose(detections, position, rotMat);
+		angle = ipt::rotation_2_euler(rotMat);
 
 		if (refactored.tag_exist_flag)
 		{

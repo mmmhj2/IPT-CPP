@@ -74,15 +74,17 @@ namespace ipt
 			cv::Mat img_nxt, 
 			zarray_t*& detections);
 
-		virtual void EstimatePose(zarray_t*& detections, 
+		/*virtual void EstimatePose(zarray_t*& detections,
 			cv::Vec3d& position, 
-			cv::Vec3d& angle);
+			cv::Vec3d& angle);*/
+		virtual void EstimatePose(zarray_t*& detections,
+			cv::Vec3d& position,
+			cv::Mat& rotationMat);
 
 		// Estimate the pose, but use an orientation supplied externally
 		// Provides no angle estimation
 		virtual void EstimatePoseWithOrientation(zarray_t*& detections,
 			cv::Vec3d& position,
-			cv::Vec3d& angle,
 			const cv::Mat& rotationMat);
 
 		// Estimate the pose with an orientation supplied externally
@@ -90,7 +92,6 @@ namespace ipt
 		// Provides no angle estimation
 		virtual void EstimatePoseWithOrientation(zarray_t*& detections,
 			cv::Vec3d& position,
-			cv::Vec3d& angle,
 			const cv::Mat& rotationMat,
 			cv::Vec3d& positionRaw,
 			cv::Vec3d& angleRaw,

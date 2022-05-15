@@ -258,7 +258,7 @@ void
 ipt::IPT_Receiver::EstimatePose(
 	zarray_t*& detections, 
 	cv::Vec3d& position, 
-	cv::Vec3d& angle)
+	cv::Mat& rotationMat)
 {
 	if (!tag_exist_flag)
 		return;
@@ -273,15 +273,13 @@ ipt::IPT_Receiver::EstimatePose(
 	position[0] = p.at<double>(0, 0);
 	position[1] = p.at<double>(1, 0);
 	position[2] = p.at<double>(2, 0);
-	angle = rotation_2_euler(R_c_w);
-
+	rotationMat = R_c_w;
 }
 
 void 
 ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	zarray_t*& detections,
 	cv::Vec3d& position,
-	cv::Vec3d& angle,
 	const cv::Mat& rotationMat)
 {
 	cv::Mat R_c_w, rvec, tvec;
@@ -299,7 +297,6 @@ ipt::IPT_Receiver::EstimatePoseWithOrientation(
 void ipt::IPT_Receiver::EstimatePoseWithOrientation(
 	zarray_t*& detections,
 	cv::Vec3d& position,
-	cv::Vec3d& angle,
 	const cv::Mat& rotationMat,
 	cv::Vec3d& positionRaw,
 	cv::Vec3d& angleRaw,
