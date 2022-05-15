@@ -15,9 +15,9 @@ import sys
 from geometry_msgs.msg import PoseWithCovarianceStamped
 
 COVARIANCEARRAY = [
-0.006, 0, 0, 0, 0, 0,
-0, 0.006, 0, 0, 0, 0,
-0, 0, 0.006, 0, 0, 0,
+0.01, 0, 0, 0, 0, 0,
+0, 0.01, 0, 0, 0, 0,
+0, 0, 0.01, 0, 0, 0,
 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0,
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     rp.myargv(argv = sys.argv)
 
     seq = 0
-    rate = rp.Rate(60)
+    rate = rp.Rate(30)
     tagId = rp.get_param("~TagId", 0)
     topicName = rp.get_param("~TopicName", "uwb/pose_cov")
     serialName = rp.get_param("~SerialName", "/dev/ttyUSB0")

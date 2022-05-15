@@ -18,12 +18,12 @@ namespace ipt
 	private:
 
 		constexpr static std::array<double, 36> CovarianceArray = 
-			{1, 0, 0, 0, 0, 0, 
-			0, 1, 0, 0, 0, 0,
-			0, 0, 1, 0, 0, 0,
-			0, 0, 0, 1, 0, 0,
-			0, 0, 0, 0, 1, 0,
-			0, 0, 0, 0, 0, 1};
+			{0.1, 0, 0, 0, 0, 0, 
+			0, 0.1, 0, 0, 0, 0,
+			0, 0, 0.1, 0, 0, 0,
+			0, 0, 0, 0.1, 0, 0,
+			0, 0, 0, 0, 0.1, 0,
+			0, 0, 0, 0, 0, 0.1};
 
 		std::string orientationSubscriberNodeName;
 		std::string imuSubscriberNodeName;
