@@ -142,6 +142,7 @@ int main(int argc, char * argv[])
 		{
 			cv::Mat rotMat;
 			receiver.EstimatePose(detections, position, rotMat);
+			rotMat = rotMat * R_b_c;
 
 			posePub.header.stamp = frameTime;
 			posePub.pose.position.x = position[0];
